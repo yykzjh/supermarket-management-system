@@ -3,12 +3,13 @@ import VueRouter from 'vue-router'
 import Login from '../components/Login'
 import Home from '../components/Home'
 import Welcome from '../components/Welcome'
-import Staff from '../components/Staff/Staff'
+import Superinfo from '../components/Staff/Superinfo'
 import Supplier from '../components/Supplier/Supplier'
 import Goods from '../components/Goods/Goods'
 import Purchase from '../components/Purchase/Purchase'
 import Sales from '../components/Sales/Sales'
 import Statistic from '../components/Statistic/Statistic'
+import Admininfo from '../components/Staff/Admininfo'
 
 Vue.use(VueRouter)
 
@@ -18,7 +19,8 @@ const routes = [
   { path: '/home', component: Home, redirect: '/welcome',
     children: [
       { path: '/welcome', component: Welcome },
-      { path: '/staff', component: Staff },
+      { path: '/superinfo', component: Superinfo },
+      { path: '/admininfo', component: Admininfo },
       { path: '/supplier', component: Supplier },
       { path: '/goods', component: Goods },
       { path: '/purchase', component: Purchase },

@@ -22,7 +22,29 @@
           :collapse="isCollapse" :collapse-transition="false"
           :router="true" :default-active="activePath"
         >
-          <el-menu-item :index="item.path" v-for="item in menuList" :key="item.id" @click="saveNavStatus(item.path)">
+          <el-submenu index="1">
+            <template slot="title">
+              <i :class="menuList[0].icon"></i>
+              <span>{{menuList[0].name}}</span>
+            </template>
+            <el-menu-item-group>
+              <template slot="title"></template>
+              <el-menu-item :index="menuList[0].children[0].path">
+                <template slot="title">
+                  <i class="el-icon-menu"></i>
+                  <span>{{menuList[0].children[0].name}}</span>
+                </template>
+              </el-menu-item>
+              <el-menu-item :index="menuList[0].children[1].path">
+                <template slot="title">
+                  <i class="el-icon-menu"></i>
+                  <span>{{menuList[0].children[1].name}}</span>
+                </template>
+              </el-menu-item>
+            </el-menu-item-group>
+          </el-submenu>
+
+          <el-menu-item :index="item.path" v-for="(item, index) in menuList" v-if="index >= 1" :key="item.id" @click="saveNavStatus(item.path)">
             <i :class="item.icon"></i>
             <span slot="title">{{item.name}}</span>
           </el-menu-item>
@@ -42,7 +64,10 @@ export default {
   data() {
     return {
       menuList: [
-        { id: 1, name: '员工信息', path: '/staff', icon: 'el-icon-user' },
+        { id: 1, name: '员工信息', path: '/staff', icon: 'el-icon-user', children: [
+            { id: 2, name: '超级管理员', path: '/superinfo', icon: 'el-icon-menu' },
+            { id: 3, name: '普通管理员', path: '/admininfo', icon: 'el-icon-menu' },
+          ] },
         { id: 2, name: '供应商信息', path: '/supplier', icon: 'el-icon-chat-line-round'},
         { id: 3, name: '商品信息', path: '/goods', icon: 'el-icon-box' },
         { id: 4, name: '进货订单信息', path: '/purchase', icon: 'el-icon-truck' },
@@ -114,7 +139,7 @@ export default {
   }
   .toggle-button {
     background-color: #333744;
-    font-size: 20px;
+    font-size: 10px;
     line-height: 24px;
     color: white;
     text-align: center;

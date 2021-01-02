@@ -1,5 +1,5 @@
 <template>
-  <div>这是员工页面</div>
+  <div>这是超级管理员的员工页面</div>
 </template>
 
 <script>
