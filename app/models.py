@@ -6,7 +6,7 @@ from datetime import datetime
 db = SQLAlchemy(app)
 
 
-class role(db.Model):
+class Role(db.Model):
     """用户角色/身份表"""
     __tablename__ = "sms_roles"
 
