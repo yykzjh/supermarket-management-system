@@ -82,9 +82,11 @@ class Purchase(db.Model):
 
     good_id = db.Column(db.Integer, db.ForeignKey("sms_goods.id"), primary_key=True)
     supplier_id = db.Column(db.Integer, db.ForeignKey("sms_suppliers.id"), primary_key=True)
-    datetime = db.Column(db.DateTime, default=datetime.utcnow, primary_key=True)
+    buildtime = db.Column(db.DateTime, default=datetime.utcnow, primary_key=True)
+    finishtime = db.Column(db.DateTime, default=datetime.utcnow)
     amount = db.Column(db.Float, nullable=False)
     price_in = db.Column(db.Float, nullable=False)
+    if_finish = db.Column(db.Boolean, nullable=False, default=False)
     if_shelf = db.Column(db.Boolean, nullable=False, default=False)
 
     good_info = db.relationship('Good', backref=db.backref('purchase_orders', lazy="dynamic"))
@@ -137,6 +139,7 @@ class Order(db.Model):
     supplier_id = db.Column(db.Integer, db.ForeignKey("sms_suppliers.id"), primary_key=True)
     price = db.Column(db.Float, nullable=False)
     amount = db.Column(db.Float, nullable=False)
+    datetime = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     good_info = db.relationship('Good', backref=db.backref('history_sales', lazy="dynamic"))
     supplier_info = db.relationship('Supplier', backref=db.backref('history_sales', lazy="dynamic"))

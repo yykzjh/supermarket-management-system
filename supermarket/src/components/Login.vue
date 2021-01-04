@@ -33,7 +33,7 @@
       return {
         // 登录表单的数据绑定对象
         loginForm: {
-          username: 'admin',
+          username: '2017040394',
           password: '123456'
         },
         // 表单的验证规则对象
@@ -70,17 +70,18 @@
         // 匿名内部类方式
         // 返回promise对象的话，可使用async await等简化操作
         this.$refs.loginFormRef.validate(async valid => {
-          if (!valid) return;
-          const { data: res } = await this.$http.post('login', this.loginForm);
+          const {data: res}  = await this.$http.post('/Users/Login', this.loginForm);
+          console.log(res)
           // console.log(res);
-          if (res.meta.status !== 200) return this.$message.error('登录失败')
+          if (res.StatusCode !== 200) return this.$message.error('登录失败')
           this.$message.success('登陆成功')
           // 1.将登陆成功之后的token，保存到客户端的sessionStorage中
           // 1.1 项目中除了登录之外其他的API接口，必须在登陆之后才能访问
           // 1.2 token只应在当前网站打开期间生效，所以将token保存在sessionStorage中
           // 2 通过编程式导航跳转到后台主页，路由地址是 /home
-          window.sessionStorage.setItem('token', res.data.token);
-          window.sessionStorage.setItem('username', res.data.username);
+          console.log(res.data)
+          window.sessionStorage.setItem('token', res.token);
+          window.sessionStorage.setItem('username', res.username);
           this.$router.push('/home');
         })
       }
