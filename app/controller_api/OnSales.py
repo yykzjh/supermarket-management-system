@@ -1,8 +1,9 @@
 from flask import Blueprint, request
-from sqlalchemy import (or_, func)
-from app.models import db
 
 
 app_on_sales = Blueprint("app_on_sales", __name__)
 
 
+@app_on_sales.route("/Index")
+def index():
+    return "on sales index"

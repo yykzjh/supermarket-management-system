@@ -7,7 +7,10 @@ from werkzeug.routing import BaseConverter
 from flask_wtf import FlaskForm
 from wtforms import (StringField, PasswordField, SubmitField)
 from wtforms.validators import (DataRequired, EqualTo)
+from flask_cors import CORS
 
 
 
 app = Flask(__name__,template_folder="../templates",static_folder="../static") # type:Flask
+
+CORS(app,  resources={r"/*": {"origins": "*"}})
