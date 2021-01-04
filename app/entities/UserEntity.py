@@ -5,7 +5,7 @@ Description: 用户实体的方法接口
 '''
 
 from sqlalchemy import (or_, func)
-from app.models import db
+from app.models import db, User
 
 '''
 Description: 查询用户是否存在
@@ -16,5 +16,9 @@ Return:
 param {账号:str} id
 param {密码:int} password
 '''
-def Select(id, password):
-    
+def select(id, password):
+    user = User.query.filter_by(id=id, password=password).first()
+    if user == None:
+        return False
+    else:
+        return True
