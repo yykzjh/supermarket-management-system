@@ -39,8 +39,11 @@ param {角色名:str} role_name
 return {users:[User]}
 '''
 def details(role_name):
-    users = Role.query.filter_by(name=role_name).first().users.all()
-    return users
+    role = Role.query.filter_by(name=role_name).first()
+    if role == None:
+        return None
+    else:
+        return role.users.all()
 
 
 '''
@@ -52,7 +55,7 @@ param {密码:str} password
 param {角色id:int} role_id
 return {True/False}
 '''
-def update(id, password = None, role_id = None):
+def updateUser(id, password = None, role_id = None):
     user = User.query.filter_by(id=id).first()
     if user == None:
         return False
@@ -80,7 +83,7 @@ param {工资:float} salary
 param {角色id:int} role_id
 return {True/False}
 '''
-def insert(id, password, name=None, gender=None, birthday=None, mobile=None, area=None, salary=None, role_id=None)
+def addUser(id, password, name=None, gender=None, birthday=None, mobile=None, area=None, salary=None, role_id=None)
     user = User.query.filter_by(id=id).first()
     if user == None:
         newUser = User(id=id, password=password, name=name, gender=gender, birthday=birthday, mobile=mobile, area=area, salary=salary, role_id=role_id)
@@ -90,7 +93,21 @@ def insert(id, password, name=None, gender=None, birthday=None, mobile=None, are
     else:
         return False
     
-    
+'''
+description: 删除指定用户
+author: yykzjh
+Date: 2021-01-05 18:55:47
+param {账号:str} id
+return {Ture/False}
+'''
+def deleteUser(id):
+    user = User.query.filter_by(id=id).first()
+    if user == None:
+        return False
+    else:
+        db.session.delete(user)
+        db.session.commit()
+        return True
 
 
 # if __name__ == "__main__":
