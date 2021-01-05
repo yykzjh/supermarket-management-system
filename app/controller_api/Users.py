@@ -41,7 +41,9 @@ return JSON {StatusCode:200/400, users:[User]}
 @app_users.route("/AllUsers", methods=["GET"])
 def allUsers():
     role_name = request.args.get('name')
+    print(role_name)
     users = details(role_name)
+
     if users == None:
         return jsonify(StatusCode=400)
     else:
@@ -59,6 +61,7 @@ return JSON {StatusCode:200/400, user:User}
 def aUser():
     user_id = request.args.get('username')
     user = detail(user_id)
+    
     if user == None:
         return jsonify(StatusCode=400)
     else:
