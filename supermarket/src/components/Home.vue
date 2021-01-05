@@ -103,6 +103,7 @@ export default {
      height: 40px;
      width: 40px;
      margin-left: 10px;
+     border-radius: 50%;
    }
    .imgg2 {
      height: 40px;
