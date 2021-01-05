@@ -35,7 +35,7 @@
                   <span>{{menuList[0].children[0].name}}</span>
                 </template>
               </el-menu-item>
-              <el-menu-item :index="menuList[0].children[1].path">
+              <el-menu-item :index="menuList[0].children[1].path" :disabled="roleSee">
                 <template slot="title">
                   <i class="el-icon-menu"></i>
                   <span>{{menuList[0].children[1].name}}</span>
@@ -44,7 +44,14 @@
             </el-menu-item-group>
           </el-submenu>
 
-          <el-menu-item :index="item.path" v-for="(item, index) in menuList" v-if="index >= 1" :key="item.id" @click="saveNavStatus(item.path)">
+          <el-menu-item :index="menuList[1].path" :disabled="roleSee">
+            <template slot="title">
+              <i :class="menuList[1].icon"></i>
+              <span>{{menuList[1].name}}</span>
+            </template>
+          </el-menu-item>
+
+          <el-menu-item :index="item.path" v-for="(item, index) in menuList" v-if="index > 1" :key="item.id" @click="saveNavStatus(item.path)">
             <i :class="item.icon"></i>
             <span slot="title">{{item.name}}</span>
           </el-menu-item>
@@ -75,8 +82,12 @@ export default {
         { id: 6, name: '财务报表', path: '/statistic', icon: 'el-icon-data-line'},
       ],
       isCollapse: false,
-      activePath: ''
+      activePath: '',
+      roleSee: true, // 根据用户角色得到用户可访问的菜单
     }
+  },
+  created () {
+    this.getRoleId()
   },
   methods: {
     logout () {
@@ -90,6 +101,11 @@ export default {
     saveNavStatus(activePath) {
       window.sessionStorage.setItem('activePath', activePath)
       this.activePath = activePath
+    },
+    getRoleId() { // 通过获得session中的role_id来动态加载侧边栏
+      var id = window.sessionStorage.getItem('role_id')
+      if(id == 3)
+        this.roleSee = false
     }
   }
 }

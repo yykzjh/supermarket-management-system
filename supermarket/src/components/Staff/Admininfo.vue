@@ -4,7 +4,21 @@
 
 <script>
 export default {
-  name: 'Admininfo'
+  data() {
+    return {
+      AdminiList: []
+    }
+  },
+  created () {
+    this.getAdminiList()
+  },
+  methods: {
+    async getAdminiList() {
+      const {data: res} = await this.$http.get(
+        '/Users/AllUsers', { name: "superadmin" })
+      console.log(res)
+    }
+  }
 }
 </script>
 
