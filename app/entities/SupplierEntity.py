@@ -8,5 +8,13 @@ from sqlalchemy import (or_, func)
 from app.models import db, Supplier
 
 
+'''
+description: 返回所有供应商信息
+author: yykzjh
+Date: 2021-01-05 21:16:04
+param {无}
+return {[Supplier]}
+'''
 def details():
     suppliers = Supplier.query.all()
+    return suppliers
