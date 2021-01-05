@@ -12,7 +12,7 @@ Description: 登录接口 POST /Users/Login
 Author: yykzjh
 Date: 2021-01-04 13:33:20
 Param: JSON {username:str, password:str}
-Return: JSON {StatusCode:200/400, token:str}
+Return: JSON {StatusCode:200/400, token:str, role_id:int}
 '''
 @app_users.route("/Login",methods=["POST"])
 def login():
@@ -23,12 +23,13 @@ def login():
     token =base64.b64encode(os.urandom(24)).decode('utf-8')
     session["token"] = token
 
+    user = select(user_id, user_pwd)
 
-    if select(user_id, user_pwd):
-        print(token)
-        return jsonify(StatusCode=200, token=token)
+    if user != None:
+        return jsonify(StatusCode=200, token=token, role_id=user.role_id)
     else:
         return jsonify(StatusCode=400)
+
 
 
 

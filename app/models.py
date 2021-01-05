@@ -32,7 +32,7 @@ class User(db.Model):
     mobile = db.Column(db.String(64))
     area = db.Column(db.String(256))
     salary = db.Column(db.Float)
-    role_id = db.Column(db.Integer, db.ForeignKey("sms_roles.id"), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey("sms_roles.id"), default=1, nullable=False)
 
     def __repr__(self):
         return '<User: id=%r, name=%r>' % (self.id, self.name) 
