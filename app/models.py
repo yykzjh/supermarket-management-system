@@ -70,7 +70,8 @@ class Supplier(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     mobile = db.Column(db.String(64), nullable=False)
-    address = db.Column(db.String(256))
+    province = db.Column(db.String(64))
+    city = db.Column(db.String(64))
     sign_start = db.Column(db.Date, nullable=False)
     sign_end = db.Column(db.Date, nullable=False)
 
