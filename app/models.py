@@ -1,5 +1,7 @@
 from app.config import app
 from flask_sqlalchemy import SQLAlchemy
+import pymysql
+pymysql.install_as_MySQLdb()
 from datetime import datetime
 
 #创建数据库sqlalchemy工具对象
@@ -30,7 +32,7 @@ class User(db.Model):
     mobile = db.Column(db.String(64))
     area = db.Column(db.String(256))
     salary = db.Column(db.Float)
-    role_id = db.Column(db.Integer, db.ForeignKey("sms_roles.id"))
+    role_id = db.Column(db.Integer, db.ForeignKey("sms_roles.id"), default=1, nullable=False)
 
     def __repr__(self):
         return '<User: id=%r, name=%r>' % (self.id, self.name) 
@@ -82,9 +84,11 @@ class Purchase(db.Model):
 
     good_id = db.Column(db.Integer, db.ForeignKey("sms_goods.id"), primary_key=True)
     supplier_id = db.Column(db.Integer, db.ForeignKey("sms_suppliers.id"), primary_key=True)
-    datetime = db.Column(db.DateTime, default=datetime.utcnow, primary_key=True)
+    buildtime = db.Column(db.DateTime, default=datetime.utcnow, primary_key=True)
+    finishtime = db.Column(db.DateTime, default=datetime.utcnow)
     amount = db.Column(db.Float, nullable=False)
     price_in = db.Column(db.Float, nullable=False)
+    if_finish = db.Column(db.Boolean, nullable=False, default=False)
     if_shelf = db.Column(db.Boolean, nullable=False, default=False)
 
     good_info = db.relationship('Good', backref=db.backref('purchase_orders', lazy="dynamic"))
@@ -137,6 +141,7 @@ class Order(db.Model):
     supplier_id = db.Column(db.Integer, db.ForeignKey("sms_suppliers.id"), primary_key=True)
     price = db.Column(db.Float, nullable=False)
     amount = db.Column(db.Float, nullable=False)
+    datetime = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
 
     good_info = db.relationship('Good', backref=db.backref('history_sales', lazy="dynamic"))
     supplier_info = db.relationship('Supplier', backref=db.backref('history_sales', lazy="dynamic"))

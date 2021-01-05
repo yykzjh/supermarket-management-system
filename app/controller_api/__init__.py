@@ -13,4 +13,4 @@ from flask_cors import CORS
 
 app = Flask(__name__,template_folder="../templates",static_folder="../static") # type:Flask
 
-CORS(app,  resources={r"/*": {"origins": "*"}})
+CORS(app,  resources={r"/*": {"origins": "*"}}, supports_credentials=True)
