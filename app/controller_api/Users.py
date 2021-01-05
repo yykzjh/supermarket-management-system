@@ -12,7 +12,7 @@ Description: 登录接口 POST /Users/Login
 Author: yykzjh
 Date: 2021-01-04 13:33:20
 Param: JSON {username:str, password:str}
-Return: JSON {StatusCode:200/400}
+Return: JSON {StatusCode:200/400, token:str}
 '''
 @app_users.route("/Login",methods=["POST"])
 def login():

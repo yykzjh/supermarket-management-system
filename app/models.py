@@ -1,5 +1,7 @@
 from app.config import app
 from flask_sqlalchemy import SQLAlchemy
+import pymysql
+pymysql.install_as_MySQLdb()
 from datetime import datetime
 
 #创建数据库sqlalchemy工具对象
@@ -30,7 +32,7 @@ class User(db.Model):
     mobile = db.Column(db.String(64))
     area = db.Column(db.String(256))
     salary = db.Column(db.Float)
-    role_id = db.Column(db.Integer, db.ForeignKey("sms_roles.id"))
+    role_id = db.Column(db.Integer, db.ForeignKey("sms_roles.id"), nullable=False)
 
     def __repr__(self):
         return '<User: id=%r, name=%r>' % (self.id, self.name) 
