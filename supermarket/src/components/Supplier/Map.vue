@@ -21,7 +21,8 @@ export default {
       // 省份矢量数据缓存
       mapData: [],
       // 当前地图等级 1省 2市
-      nowPosition: null
+      nowPosition: null,
+      // numSupplier: [],
     }
   },
   mounted() {
@@ -50,7 +51,12 @@ export default {
           bottom: '5%',
           itemStyle: {
             areaColor: 'green'
-          }
+          },
+          roam: true,// 拖动缩放 太偏需要返回中心点
+          label: {
+            show: true
+          },
+          // center: []
         }
       }
       this.chartInstance.setOption(initOption)
@@ -66,14 +72,17 @@ export default {
         const provinceIfo = getProvinceMapInfo(arg.name)
         // console.log(provinceIfo)
         if (!this.mapData[provinceIfo.key]) {
-          alert(12345)
+          // alert(12345)
           const regionJson = await axios.get('http://localhost:8080/'+provinceIfo.path)
-          // console.log(regionJson)
+          console.log(regionJson)
           this.mapData[provinceIfo.key] = regionJson.data
           // 注册一次 string就可用
           this.$echarts.registerMap(provinceIfo.key, regionJson.data)
         }
         const newOption = {
+          title: {
+            text: arg.name+'供应商分布'
+          },
           geo: {
             map: provinceIfo.key
           }
@@ -84,8 +93,12 @@ export default {
     },
     returnChinaMap() {
       const returnOption = {
+        title: {
+          text:'供应商分布'
+        },
         geo: {
-          map: 'China'
+          map: 'China',
+          // center: []
         }
       }
       this.chartInstance.setOption(returnOption)

@@ -17,7 +17,7 @@ param {结束时间:datetime} endTime
 param {商品列表:[int]} goods
 return {支出:float}
 '''
-def balanceInPeriod(startTime, endTime, goods):
+def expenditureInPeriod(startTime, endTime, goods):
     records = Purchase.query.filter(and_(Purchase.good_id.in_(goods), Purchase.if_finish==True, \
         Purchase.finishtime>=startTime, Purchase.finishtime<endTime)).all()
     
