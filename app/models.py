@@ -18,6 +18,9 @@ class Role(db.Model):
 
     def __repr__(self):
         return '<Role: name=%r>' % self.name
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class User(db.Model):
@@ -36,6 +39,10 @@ class User(db.Model):
 
     def __repr__(self):
         return '<User: id=%r, name=%r>' % (self.id, self.name) 
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 
 class Category(db.Model):
@@ -49,6 +56,9 @@ class Category(db.Model):
 
     def __repr__(self):
         return '<Category: id=%r, name=%r, level=%r>' % (self.id, self.name, self.level)
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 class Good(db.Model):
     """商品表"""
@@ -61,6 +71,9 @@ class Good(db.Model):
 
     def __repr__(self):
         return '<Good: name=%r>' % self.category_info.name
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Supplier(db.Model):
@@ -70,12 +83,16 @@ class Supplier(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     mobile = db.Column(db.String(64), nullable=False)
-    address = db.Column(db.String(256))
+    province = db.Column(db.String(64), nullable=False)
+    city = db.Column(db.String(64), nullable=False)
     sign_start = db.Column(db.Date, nullable=False)
     sign_end = db.Column(db.Date, nullable=False)
 
     def __repr__(self):
         return '<Supplier: name=%r>' % self.name
+    
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Purchase(db.Model):
@@ -98,6 +115,9 @@ class Purchase(db.Model):
         return '<Purchase: good_name=%r, supplier_name=%r, time=%r, amount=%r, price=%r, if_sale=%r>' % \
                 (self.good_info.category_info.name, self.supplier_info.name, self.datetime, self.amount, self.price_in, self.if_shelf)
 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class Sale(db.Model):
     """上架商品表"""
@@ -115,6 +135,9 @@ class Sale(db.Model):
         return '<Sale: good_name=%r, supplier_name=%r, price=%r, amount=%r>' % \
                 (self.good_info.category_info.name, self.supplier_info.name, self.price_out, self.amount)
 
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
 
 class Stock(db.Model):
     """库存表"""
@@ -130,6 +153,9 @@ class Stock(db.Model):
     def __repr__(self):
         return '<Stock: good_name=%r, supplier_name=%r, amount=%r>' % \
                 (self.good_info.category_info.name, self.supplier_info.name, self.amount)
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
 
 class Order(db.Model):
@@ -149,4 +175,13 @@ class Order(db.Model):
     def __repr__(self):
         return '<Order: order_id=%r, good_name=%r, supplier_name=%r, price=%r, amount=%r>' % \
                 (self.id, self.good_info.category_info.name, self.supplier_info.name, self.price, self.amount)
+
+    def to_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
+
+
+def to_json(all_vendors):
+    v = [ven.to_dict() for ven in all_vendors]
+    return v
 

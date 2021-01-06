@@ -1,7 +1,7 @@
 import os
 import base64
 from flask import Blueprint, request, jsonify, session
-from app.entities.UserEntity import (select, addUser, deleteUser, details, detail)
+from app.entities.UserEntity import (select, addUser, deleteUser, details, detail, updateUser)
 
 
 app_users = Blueprint("app_users", __name__)
@@ -26,7 +26,7 @@ def login():
     user = select(user_id, user_pwd)
 
     if user != None:
-        return jsonify(StatusCode=200, token=token, role_id=user.role_id)
+        return jsonify(StatusCode=200, token=token, role_id=user.get('role_id'))
     else:
         return jsonify(StatusCode=400)
 
@@ -41,7 +41,9 @@ return JSON {StatusCode:200/400, users:[User]}
 @app_users.route("/AllUsers", methods=["GET"])
 def allUsers():
     role_name = request.args.get('name')
+    print(role_name)
     users = details(role_name)
+
     if users == None:
         return jsonify(StatusCode=400)
     else:
@@ -59,6 +61,7 @@ return JSON {StatusCode:200/400, user:User}
 def aUser():
     user_id = request.args.get('username')
     user = detail(user_id)
+    
     if user == None:
         return jsonify(StatusCode=400)
     else:

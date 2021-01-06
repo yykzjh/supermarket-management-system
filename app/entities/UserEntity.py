@@ -7,7 +7,7 @@ Description: 用户实体的方法接口
 from sqlalchemy import (or_, func)
 # import sys
 # sys.path.append("..")
-from app.models import db, User, Role
+from app.models import db, User, Role, to_json
 
 '''
 Description: 查询用户是否存在
@@ -18,7 +18,7 @@ param {密码:int} password
 '''
 def select(id, password):
     user = User.query.filter_by(id=id, password=password).first()
-    return user
+    return user.to_dict()
 
 '''
 description: 返回指定用户的信息
@@ -29,7 +29,7 @@ return {user:User}
 '''
 def detail(id):
     user = User.query.filter_by(id=id).first()
-    return user
+    return user.to_dict()
 
 '''
 description: 返回指定角色的所有用户信息
@@ -40,10 +40,11 @@ return {users:[User]}
 '''
 def details(role_name):
     role = Role.query.filter_by(name=role_name).first()
+    print(role)
     if role == None:
         return None
     else:
-        return role.users.all()
+        return to_json(role.users.all())
 
 
 '''
