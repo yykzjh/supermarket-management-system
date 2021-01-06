@@ -33,7 +33,7 @@
       return {
         // 登录表单的数据绑定对象
         loginForm: {
-          username: '2017040394',
+          username: '2017040380',
           password: '123456'
         },
         // 表单的验证规则对象
@@ -79,9 +79,8 @@
           // 1.1 项目中除了登录之外其他的API接口，必须在登陆之后才能访问
           // 1.2 token只应在当前网站打开期间生效，所以将token保存在sessionStorage中
           // 2 通过编程式导航跳转到后台主页，路由地址是 /home
-          console.log(res.data)
           window.sessionStorage.setItem('token', res.token);
-          window.sessionStorage.setItem('username', res.username);
+          window.sessionStorage.setItem('role_id', res.role_id);
           this.$router.push('/home');
         })
       }
