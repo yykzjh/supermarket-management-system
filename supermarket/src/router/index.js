@@ -13,6 +13,8 @@ import Admininfo from '../components/Staff/Admininfo'
 
 import SupplierMap from '../components/Supplier/Map'
 
+abcd
+
 Vue.use(VueRouter)
 
 const routes = [

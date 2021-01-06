@@ -46,7 +46,7 @@
       title="修改用户密码"
       :visible.sync="editPassSee"
       width="50%">
-      <el-form :model="editForm" :rules="editRules" ref="editFormRef" label-width="70px">
+      <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="70px">
         <el-form-item label="用户名">
           <el-input v-model="editForm.name" disabled></el-input>
         </el-form-item>
@@ -89,7 +89,7 @@ export default {
       userName: '',
       editPassSee: false,
       editForm: {},
-      editRules: {
+      editFormRules: {
         password: [
           {
             required: true,
