@@ -109,9 +109,3 @@ def deleteUser(id):
         db.session.delete(user)
         db.session.commit()
         return True
-
-
-# if __name__ == "__main__":
-#     # print(detail(2017040394))
-#     # print(details(("staff"))[0].password)
-#     # print(details(("superadmin"))[0].password)
