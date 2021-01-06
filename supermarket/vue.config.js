@@ -1,3 +1,13 @@
+var webpack = require('webpack')
 module.exports = {
-  lintOnSave: false
+  lintOnSave: false,
+  configureWebpack: {
+    plugins: [
+      new webpack.ProvidePlugin({
+        $: "jquery",
+        jQuery: "jquery",
+        "windows.jQuery": "jquery"
+      })
+    ]
+  }
 }

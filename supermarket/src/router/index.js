@@ -11,6 +11,8 @@ import Sales from '../components/Sales/Sales'
 import Statistic from '../components/Statistic/Statistic'
 import Admininfo from '../components/Staff/Admininfo'
 
+import SupplierMap from '../components/Supplier/Map'
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -22,6 +24,7 @@ const routes = [
       { path: '/superinfo', component: Superinfo },
       { path: '/admininfo', component: Admininfo },
       { path: '/supplier', component: Supplier },
+      { path: '/supplierMap', component: SupplierMap },
       { path: '/goods', component: Goods },
       { path: '/purchase', component: Purchase },
       { path: '/sales', component: Sales },
