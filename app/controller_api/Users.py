@@ -1,7 +1,7 @@
 import os
 import base64
 from flask import Blueprint, request, jsonify, session
-from app.entities.UserEntity import (select, addUser, deleteUser, details, detail)
+from app.entities.UserEntity import (select, addUser, deleteUser, details, detail, updateUser)
 
 
 app_users = Blueprint("app_users", __name__)
