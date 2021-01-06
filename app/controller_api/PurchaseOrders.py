@@ -35,7 +35,17 @@ def expenditureOfTimeAndCat():
     return jsonify(expenditure=cost)
 
 
-
+'''
+description: 根据提供的时间段、划分单位和划分长度、商品类别id，返回分段的支出数据
+author: yykzjh
+Date: 2021-01-06 11:54:06
+param {开始时间:datetime} startTime
+param {结束时间:datetime} endTime
+param {分段单位:'year'/'month'/'day'/'hour'} unit
+param {分段的长度:int} timeLength
+param {类别id:int} catId
+return JSON {results:[dict]} dict:{startTime, endTime, expenditure}
+'''
 @app_purchase_orders.route("/ExpenditureOfDivideTime", methods=["POST"])
 def expenditureOfDivideTime():
     # 解析请求中的数据
