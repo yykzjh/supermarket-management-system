@@ -1,0 +1,1 @@
+SELECT * FROM supermarket.sms_purchase;
