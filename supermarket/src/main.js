@@ -10,6 +10,12 @@ import './assets/fonts/iconfont.css'
 
 // 配置axios，每个Vue的组件都能通过this直接访问http从而发起网络请求
 import axios from 'axios'
+
+// import 'jquery'
+import Echarts from 'echarts'
+// 把echarts挂载到 Vue原型上，以便全局访问
+Vue.prototype.$echarts = Echarts
+
 // 配置请求的根路径
 axios.defaults.baseURL = 'http://127.0.0.1:5000'
 // 给服务器发送的请求进行预先处理，确定用户token再进行权限处理
