@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.entities.GoodEntity import searchGoodsId
-from app.entities.PurchaseOrderEntity import balanceInPeriod
+from app.entities.PurchaseOrderEntity import expenditureInPeriod
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -30,7 +30,7 @@ def expenditureOfTimeAndCat():
     catId = info.get('catId')
 
     allGoodsId = searchGoodsId(catId)
-    cost = balanceInPeriod(startTime, endTime, allGoodsId)
+    cost = expenditureInPeriod(startTime, endTime, allGoodsId)
 
     return jsonify(expenditure=cost)
 
@@ -82,7 +82,7 @@ def expenditureOfDivideTime():
         aPeriod['startTime'] = current_start.strftime('%Y-%m-%d %H:%M:%S')
         aPeriod['endTime'] = current_end.strftime('%Y-%m-%d %H:%M:%S')
           # 获取该时间段的支出
-        aPeriod['expenditure'] = balanceInPeriod(current_start, current_end, allGoodsId)
+        aPeriod['expenditure'] = expenditureInPeriod(current_start, current_end, allGoodsId)
         results.append(aPeriod)
         #改变循环条件
         current_start += delta
