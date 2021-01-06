@@ -26,7 +26,7 @@ def login():
     user = select(user_id, user_pwd)
 
     if user != None:
-        return jsonify(StatusCode=200, token=token, role_id=user.role_id)
+        return jsonify(StatusCode=200, token=token, role_id=user.get('role_id'))
     else:
         return jsonify(StatusCode=400)
 
