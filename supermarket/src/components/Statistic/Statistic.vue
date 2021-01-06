@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="chart-container">
         <div>
             <el-switch
                 style="float:left; display: block; padding-bottom: 5px;"
@@ -13,9 +13,10 @@
                 <el-date-picker
                     ref="picker1"
                     v-model="picker1"
-                    type="datetime"
+                    type="date"
                     placeholder="选择日期时间"
-                    :picker-options="pickerOptions">
+                    :picker-options="pickerOptions"
+                    value-format="yyyy-MM-dd">
                 </el-date-picker>
             </div>
             <div class="subTimeBlock" v-if="!valueSwitch">
@@ -26,7 +27,8 @@
                     :picker-options="pickerOptionsRange"
                     range-separator="至"
                     start-placeholder="开始时间"
-                    end-placeholder="结束时间">
+                    end-placeholder="结束时间"
+                    value-format="yyyy-MM-dd HH:mm:ss">
                 </el-date-picker>
             </div>
             <el-button icon="el-icon-search" circle @click="getData"></el-button>
@@ -39,11 +41,11 @@
 </template>
 
 <script>
-import axios from 'axios';
+import '../../assets/css/charts.css'
   export default {
     data() {
         return {
-            valueSwitch: true,
+            valueSwitch: false,
             pickerOptionsRange: {
                 shortcuts: [{
                     text: '最近一周',
@@ -104,21 +106,129 @@ import axios from 'axios';
             xAxisData: [],
             moneyIn: [],
             moneyOut: [],
-            money: []
+            money: [],
+            chartInstance: null,
         }
     },
     mounted() {
-        this.getData()
-        // this.initChart()
+        this.initChart()
     },
     methods: {
         initChart() {
+            console.log(123456)
+            this.chartInstance = this.$echarts.init(this.$refs.statistic_ref)
+            var emphasisStyle = {
+                itemStyle: {
+                    barBorderWidth: 1,
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowOffsetY: 0,
+                    shadowColor: 'rgba(0,0,0,0.5)'
+                }
+            }
+            const initOption = {
+                backgroundColor: '#eee',
+                legend: {
+                    data: ['收入', '支出'],
+                    left: 10
+                },
+                // brush: {
+                //     toolbox: ['rect', 'polygon', 'lineX', 'lineY', 'keep', 'clear'],
+                //     xAxisIndex: 0
+                // },
+                toolbox: {
+                    feature: {
+                        magicType: {
+                            type: ['stack', 'tiled']
+                        },
+                        dataView: {}
+                    }
+                },
+                tooltip: {},
+                xAxis: {
+                    data: this.xAxisData,
+                    name: 'X Axis',
+                    axisLine: {onZero: true},
+                    splitLine: {show: false},
+                    splitArea: {show: false}
+                },
+                yAxis: {
+                    inverse: true,
+                    splitArea: {show: false}
+                },
+                grid: {
+                    left: 100
+                },
+                visualMap: {
+                    type: 'continuous',
+                    dimension: 1,
+                    text: ['High', 'Low'],
+                    inverse: true,
+                    itemHeight: 200,
+                    calculable: true,
+                    min: -2,
+                    max: 6,
+                    top: 60,
+                    left: 10,
+                    inRange: {
+                        colorLightness: [0.4, 0.8]
+                    },
+                    outOfRange: {
+                        color: '#bbb'
+                    },
+                    controller: {
+                        inRange: {
+                            color: '#2f4554'
+                        }
+                    }
+                },
+                series: [
+                    {
+                        name: '收入',
+                        type: 'bar',
+                        stack: 'one',
+                        emphasis: emphasisStyle,
+                        data: this.moneyIn
+                    },
+                    {
+                        name: '支出',
+                        type: 'bar',
+                        stack: 'one',
+                        emphasis: emphasisStyle,
+                        data: this.moneyOut
+                    },
+                ]
+            }
+            this.chartInstance.setOption(initOption)
         },
         async getData() {
-            // console.log('search')
-            var postData = null
-            // var ret = await this.$http.get('/', postData)
-            // console.log(ret)
+            var startTime = null
+            var endTime = null
+            // "picker"+String(this.valueSwitch?1:0)
+            if(this.valueSwitch) {// 某一天
+                // console.log(this.picker1)
+                startTime=this.picker1+" 00:00:00"
+                endTime=this.picker1+" 23:59:59"
+            } else {// 某一时间段
+                // console.log(this.picker2)
+                startTime=this.picker2[0]
+                endTime=this.picker2[1]
+            }
+            // console.log(startTime)
+            // console.log(endTime)
+    
+            var postData = {'startTime':startTime,'endTime':endTime,'catId':1,'unit':'day','timeLength':15}
+            var ret = await this.$http.post('/PurchaseOrders/ExpenditureOfDivideTime', postData)
+            var jsonData = ret.data.results
+            // console.log(jsonData[1].startTime)
+            for (var i = 0; i < jsonData.length; i++) {
+                // console.log(i,jsonData[i].startTime)
+                this.xAxisData.push(i);//jsonData[i].startTime
+                this.moneyIn.push(jsonData[i].expenditure);
+                this.moneyOut.push(jsonData[i].expenditure);
+            }
+
+            this.initChart()
         },
         updateChart() {
 
