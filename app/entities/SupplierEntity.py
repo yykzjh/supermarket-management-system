@@ -5,7 +5,7 @@ Description: 供货商实体的方法接口
 '''
 
 from sqlalchemy import (or_, func)
-from app.models import db, Supplier
+from app.models import db, Supplier, to_json
 
 
 '''
@@ -17,4 +17,4 @@ return {[Supplier]}
 '''
 def details():
     suppliers = Supplier.query.all()
-    return suppliers
+    return to_json(suppliers)
