@@ -12,6 +12,7 @@ import Statistic from '../components/Statistic/Statistic'
 import Admininfo from '../components/Staff/Admininfo'
 
 import SupplierMap from '../components/Supplier/Map'
+123456789
 
 Vue.use(VueRouter)
 
