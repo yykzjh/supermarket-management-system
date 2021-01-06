@@ -14,8 +14,11 @@ export default {
   },
   methods: {
     async getAdminiList() {
-      const {data: res} = await this.$http.get(
-        '/Users/AllUsers', { name: "superadmin" })
+      const {data: res} = await this.$http.get('Users/AllUsers',{
+        params:{
+          name:"superadmin"
+        }
+      })
       console.log(res)
     }
   }
