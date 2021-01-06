@@ -4,8 +4,8 @@
             <el-switch
                 style="float:left; display: block; padding-bottom: 5px;"
                 v-model="valueSwitch"
-                active-color="#00BFFF"
-                inactive-color="#00BFFF"
+                active-color="#2f4554"
+                inactive-color="#2f4554"
                 active-text="某一天"
                 inactive-text="某一段">
             </el-switch>
@@ -108,14 +108,16 @@ import '../../assets/css/charts.css'
             moneyOut: [],
             money: [],
             chartInstance: null,
+            moneyMax: 0
         }
     },
     mounted() {
+        this.dummyData()
         this.initChart()
     },
     methods: {
         initChart() {
-            console.log(123456)
+            // this.dummyData()
             this.chartInstance = this.$echarts.init(this.$refs.statistic_ref)
             var emphasisStyle = {
                 itemStyle: {
@@ -153,7 +155,7 @@ import '../../assets/css/charts.css'
                     splitArea: {show: false}
                 },
                 yAxis: {
-                    inverse: true,
+                    inverse: false,
                     splitArea: {show: false}
                 },
                 grid: {
@@ -166,8 +168,8 @@ import '../../assets/css/charts.css'
                     inverse: true,
                     itemHeight: 200,
                     calculable: true,
-                    min: -2,
-                    max: 6,
+                    min: -this.moneyMax,
+                    max: this.moneyMax,
                     top: 60,
                     left: 10,
                     inRange: {
@@ -184,24 +186,24 @@ import '../../assets/css/charts.css'
                 },
                 series: [
                     {
+                        name: '支出',
+                        type: 'bar',
+                        stack: 'one',
+                        emphasis: emphasisStyle,
+                        data: this.moneyOut
+                    },{
                         name: '收入',
                         type: 'bar',
                         stack: 'one',
                         emphasis: emphasisStyle,
                         data: this.moneyIn
                     },
-                    {
-                        name: '支出',
-                        type: 'bar',
-                        stack: 'one',
-                        emphasis: emphasisStyle,
-                        data: this.moneyOut
-                    },
                 ]
             }
             this.chartInstance.setOption(initOption)
         },
         async getData() {
+            this.cleanContainer()
             var startTime = null
             var endTime = null
             // "picker"+String(this.valueSwitch?1:0)
@@ -213,26 +215,52 @@ import '../../assets/css/charts.css'
                 // console.log(this.picker2)
                 startTime=this.picker2[0]
                 endTime=this.picker2[1]
-            }
+            } 
             // console.log(startTime)
             // console.log(endTime)
     
             var postData = {'startTime':startTime,'endTime':endTime,'catId':1,'unit':'day','timeLength':15}
             var ret = await this.$http.post('/PurchaseOrders/ExpenditureOfDivideTime', postData)
             var jsonData = ret.data.results
-            // console.log(jsonData[1].startTime)
+            console.log(jsonData.length)
+            this.moneyMax = 0
             for (var i = 0; i < jsonData.length; i++) {
                 // console.log(i,jsonData[i].startTime)
                 this.xAxisData.push(i);//jsonData[i].startTime
                 this.moneyIn.push(jsonData[i].expenditure);
-                this.moneyOut.push(jsonData[i].expenditure);
+                this.moneyOut.push(-jsonData[i].expenditure);
+                if(jsonData[i].expenditure > this.moneyMax) {
+                    this.moneyMax = jsonData[i].expenditure
+                }
             }
-
             this.initChart()
         },
         updateChart() {
 
         },
+        screenAdapter() {
+            // alert('size: '+titleFontSize)
+            const adaptOption = {
+            }
+            this.chartInstance.setOption(adaptOption)
+            this.chartInstance.resize()
+        },
+        dummyData() {
+            for (var i = 0; i < 10; i++) {
+                this.xAxisData.push('Dy' + i);
+                this.moneyIn.push((Math.random() * 2).toFixed(2));
+                this.moneyOut.push(-Math.random().toFixed(2));
+            }
+            this.moneyMax = 6
+        },
+        cleanContainer() {
+            // 1: arr.splice(0,arr.length)
+            // 2: arr = []
+            this.xAxisData.length = 0
+            this.moneyIn.length = 0
+            this.moneyOut.length = 0
+            this.moneyMax = 0
+        }
     }
   }
 </script>
