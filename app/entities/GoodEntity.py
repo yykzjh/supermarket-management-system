@@ -64,3 +64,25 @@ return {Good}
 def goodDetail(good_id):
     good = Good.query.get(good_id).to_dict()
     return good
+
+
+'''
+description: 新增商品类别
+author: yykzjh
+Date: 2021-01-07 15:24:46
+param {类别名称:str} name
+param {新类别所属夫类:int} parent
+param {新类别所属的分级层次:int} level
+return {新类别自动分配的id:int} 
+'''
+def addNewCat(name, parent, level):
+    # 检测不能添加同名类别
+    findCat = Category.query.filter_by(name=name).first()
+    if findCat != None:
+        return 0
+
+    # 添加新类别
+    newCat = Category(name=name, parent=parent, level=level)
+    db.session.add(newCat)
+    db.session.commit()
+    return newCat.id

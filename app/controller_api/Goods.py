@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app.entities.GoodEntity import searchGoodsId, categoryDetails, goodDetail
+from app.entities.GoodEntity import searchGoodsId, categoryDetails, goodDetail, addNewCat
 
 
 app_goods = Blueprint("app_goods", __name__)
@@ -58,5 +58,31 @@ def getGoodDetail():
         return jsonify(StatusCode=200, good=good)
 
 
+'''
+description: 添加一条分支的类别
+author: yykzjh
+Date: 2021-01-07 15:39:13
+param {已知父节点的id:int} pid
+param {已知父节点的层次:int} plevel
+param {新添加的一条类别分支的类别名列表:[str]} name_list
+return JSON {StatusCode:200/400}
+'''
+@app_goods.route("/NewCats", methods=["POST"])
+def addNewCats():
+    # 获取请求体中的数据
+    info = request.get_json()
+    parent_id = info.get('pid')
+    parent_level = info.get('plevel')
+    cats_name_list = info.get('name_list')
 
+    # 循环添加新类别
+    current_level = parent_level + 1
+    for name in cats_name_list:
+        parent_id = addNewCat(name, parent_id, current_level)
+        # 如果添加的类别和已知类别重名，则返回错误
+        if parent_id == 0:
+            return jsonify(StatusCode=400)
+        current_level += 1
+    return jsonify(StatusCode=200)
+    
 
