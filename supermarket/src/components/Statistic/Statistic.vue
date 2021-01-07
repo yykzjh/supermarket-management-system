@@ -289,6 +289,7 @@ import '../../assets/css/charts.css'
 
             var postData = {'startTime':startTime,'endTime':endTime,'catId':1,'unit':this.unit,'timeLength':this.valueAddLength}
             var ret = await this.$http.post('/PurchaseOrders/ExpenditureOfDivideTime', postData)
+            // 需要写获取失败的判断
             var jsonData = ret.data.results
             console.log(jsonData.length)
             this.moneyMax = 0
