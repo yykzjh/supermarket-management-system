@@ -11,6 +11,9 @@ import './assets/fonts/iconfont.css'
 // 配置axios，每个Vue的组件都能通过this直接访问http从而发起网络请求
 import axios from 'axios'
 
+// 导入商品分类列表中的tree-table
+import TreeTable from 'vue-table-with-tree-grid'
+
 // import 'jquery'
 import Echarts from 'echarts'
 // 把echarts挂载到 Vue原型上，以便全局访问
@@ -25,6 +28,8 @@ axios.interceptors.request.use(config => {
 })
 // 可通过this去访问http
 Vue.prototype.$http = axios
+
+Vue.component('tree-table', TreeTable)
 
 Vue.config.productionTip = false
 new Vue({
