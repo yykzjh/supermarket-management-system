@@ -61,6 +61,6 @@ Date: 2021-01-06 16:15:32
 param {商品id:int} good_id
 return {Good}
 '''
-def goodDetails(good_id):
+def goodDetail(good_id):
     good = Good.query.get(good_id).to_dict()
     return good
