@@ -1,5 +1,10 @@
 from flask import Blueprint, request, jsonify
-from app.entities.GoodEntity import searchGoodsId, categoryDetails, goodDetail, addNewCat
+from app.entities.GoodEntity import searchGoodsId, categoryDetails, goodDetail, addNewCat, addNewGood
+from app.models import app
+import uuid
+import datetime
+import os
+from werkzeug.utils import secure_filename
 
 
 app_goods = Blueprint("app_goods", __name__)
@@ -86,3 +91,40 @@ def addNewCats():
     return jsonify(StatusCode=200)
     
 
+'''
+description: 新增商品
+author: yykzjh
+Date: 2021-01-07 18:01:28
+param {商品名:str} name
+param {商品所属类别id:int} parent
+param {商品简介:str} intro
+param {商品图片:file} icon
+return JSON {StatusCode:200/400}
+'''
+@app_goods.route("/NewGood", methods=["POST"])
+def insertNewGood():
+    good_name = request.form.get('name')
+    good_parent = request.form.get('parent')
+    good_intro = request.form.get('intro')
+    good_icon = request.files.get('icon') # 获取商品图片
+
+    # 获取文件名
+    icon_name = secure_filename(good_icon.filename)
+
+    # 生成自定义图片名
+    namespace = uuid.NAMESPACE_URL
+    iconNewName = ''.join(str(uuid.uuid3(namespace, icon_name)).split('-')) + icon_name
+
+    # 根据当前时间生成图片存储路径
+    dateFile = datetime.datetime.now().strftime('%Y-%m-%d')
+    path = dateFile + '/' + iconNewName
+    adsolutePath = app.config['UPLOAD_FOLDER'] + '/' + dateFile
+    
+    # 保存新商品信息到数据库
+    if addNewGood(good_name, good_parent, good_intro, path):
+        if not os.path.exists(adsolutePath):
+            os.makedirs(adsolutePath)
+        good_icon.save(app.config['UPLOAD_FOLDER'] + '/' + path)
+        return jsonify(StatusCode=200)
+    else: 
+        return jsonify(StatusCode=400)
