@@ -86,3 +86,33 @@ def addNewCat(name, parent, level):
     db.session.add(newCat)
     db.session.commit()
     return newCat.id
+
+
+'''
+description: 添加新的商品信息
+author: yykzjh
+Date: 2021-01-07 16:18:51
+param {商品名:str} name
+param {商品所属夫类:int} parent
+param {商品详细介绍:str} info
+param {商品存储地址:str} icon
+return {boolean:Ture/False}
+'''
+def addNewGood(name, parent, intro, icon):
+    # 检测不能添加同名商品
+    good = Category.query.filter_by(name=name).first()
+    if good != None:
+        return False
+
+    # 在类别表中新建商品记录
+    newCat = Category(name=name, parent=parent, level=4)
+    db.session.add(newCat)
+    db.session.commit()
+
+    # 在商品表中新建商品记录
+    newGood = Good(id=newCat.id, intro=intro, icon=icon)
+    db.session.add(newGood)
+    db.session.commit()
+
+    return True
+
