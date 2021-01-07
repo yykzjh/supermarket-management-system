@@ -4,7 +4,7 @@ import Login from '../components/Login'
 import Home from '../components/Home'
 import Welcome from '../components/Welcome'
 import Superinfo from '../components/Staff/Superinfo'
-import Supplier from '../components/Supplier/Supplier'
+// import Supplier from '../components/Supplier/Supplier'
 import Category from '../components/Goods/Category'
 import GoodInfo from '../components/Goods/GoodInfo'
 import Purchase from '../components/Purchase/Purchase'
@@ -24,8 +24,8 @@ const routes = [
       { path: '/welcome', component: Welcome },
       { path: '/superinfo', component: Superinfo },
       { path: '/admininfo', component: Admininfo },
-      { path: '/supplier', component: Supplier },
-      { path: '/supplierMap', component: SupplierMap },
+//       { path: '/supplier', component: Supplier },
+      { path: '/supplier', component: SupplierMap },
       { path: '/category', component: Category },
       { path: '/goodInfo', component: GoodInfo},
       { path: '/purchase', component: Purchase },
