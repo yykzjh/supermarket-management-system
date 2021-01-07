@@ -7,10 +7,12 @@
       <el-breadcrumb-item>商品信息</el-breadcrumb-item>
     </el-breadcrumb>
     <!--商品列表-->
+
     <el-card class="box-card">
-      <el-row>
+      <el-row :gutter="30">
         <el-col>
           <el-button class="gutter" type="primary" @click="addCateSee = true">添加分类</el-button>
+          <el-button class="gutter" type="primary" @click="addGood">添加商品</el-button>
         </el-col>
       </el-row>
 
@@ -49,20 +51,28 @@
       </el-table>
     </el-card>
 
-
     <!--添加分类对话框-->
-    <el-dialog
-      title="修改用户密码"
-      :visible.sync="addCateSee"
-      width="50%">
-      <el-form :model="addCateForm" :rules="addCateFormRules" ref="addCateFormRef" label-width="90px">
-        <el-form-item label="分类名称" prop="name">
-          <el-input v-model="addCateForm.name"></el-input>
+    <el-dialog title="增加商品分类" :visible.sync="addCateSee" width="50%">
+      <el-form :model="tempForm" ref="tempFormRef" label-width="90px">
+        <el-form-item label="父级分类">
+          <el-cascader
+            v-model="tempForm.choseValue"
+            :options="goodList"
+            :props="{ expandTrigger: 'hover', checkStrictly: true, value:'id',label:'name',children:'children' }"
+           ></el-cascader>
         </el-form-item>
-        <el-form-item label="父级分类" >
-          <el-input v-model="addCateForm.parent"></el-input>
+
+        <el-form-item v-for="(domain, index) in tempForm.domains" :label="index === 0 ?  '添加分类':''" :key="domain.key"
+                      >
+          <el-input v-model="domain.value"  style="width: 60%;"></el-input>
+          <el-button @click="removeDomain(domain)" style="margin-left: 10px" icon="el-icon-delete" type="warning" size="mini"></el-button>
         </el-form-item>
+        <el-button type="text" @click="addDomain" style="left: 50px;">＋ 添加同级分类</el-button>
       </el-form>
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="addCateSee = false">取消</el-button>
+          <el-button type="primary" @click="AddCate">确定</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -73,17 +83,18 @@ export default {
     return {
       goodList: [],
       totalNum: 0,
-      choseValue: [],
       addCateSee: false,
+      tempForm: { // 提交增加分类表单前的预操作
+        choseValue: [],
+        domains: [{ value: '', key:  1}],
+      },
       addCateForm: {
-        name: '',
-        level: 0,
-        parent: 1,
+        pid: 0,
+        plevel: 0,
+        name_list: [],
       },
       columns: [{ label: '分类名称', prop: 'name' },
         { label: '分类级别', prop: 'level', type:'template', template: 'detail'}],
-      addCateFormRules:{
-        name: [{ required: true, message: '请输入分类名称', trigger: 'blur' }] },
     }
   },
   created () {
@@ -97,10 +108,68 @@ export default {
       else
         this.goodList = res.results
       this.totalNum = this.goodList.length
+      this.setDisable(1, this.goodList, 2)
       console.log(this.goodList)
     },
     jumpToInfo(goodid) {
       this.$router.push('/goodInfo?goodid=' + goodid)
+    },
+    // 增加分类选框
+    addDomain() {
+      this.tempForm.domains.push({ value: '', key: Date.now() })
+    },
+    // 移除分类选框
+    removeDomain(item) {
+      var index = this.tempForm.domains.indexOf(item)
+      if(index !== 0)
+        this.tempForm.domains.splice(index, 1)
+    },
+    changeHandle(){
+      console.log(this.choseValue)
+    },
+    // 设置第四级分类，即商品不可选中
+    setDisable (count, data, maxNum) {
+      if (count > maxNum) {
+        data.forEach(v => {
+          v.disabled = true // 超过设定的最大级数,给这一集的数据添加disabled属性
+        })
+      } else {
+        data.forEach(v => {
+          v.count = count // 设置最外层数据的初始count
+
+          if (v.children && v.children.length) {
+            v.count++
+            this.setDisable(v.count, v.children, maxNum) // 子级循环时把这一层数据的count传入
+          }
+        })
+      }
+    },
+    async AddCate() {
+      if(this.tempForm.domains[0].value === ''){
+        this.$message.error('请填写必填项')
+        return;
+      }
+      else{
+        // console.log(this.tempForm)
+        var len = this.tempForm.choseValue.length
+        this.addCateForm.pid = this.tempForm.choseValue[len-1]
+        this.addCateForm.plevel = len
+        for(let i=0; i<this.tempForm.domains.length; i++)
+          this.addCateForm.name_list.push(this.tempForm.domains[i].value)
+        // console.log(this.addCateForm)
+        const {data: res} = await this.$http.post('/Goods/NewCats', this.addCateForm)
+        if(res.StatusCode !== 200)
+          this.$message.error('增加商品分类失败')
+        else {
+          this.$message.success('增加商品分类成功')
+          this.addCateSee = false
+          this.getGoodsList()
+        }
+      }
+    },
+    // 添加商品，跳转至添加商品页面
+    addGood(){
+      this.$router.push('/addgood')
     }
   }
 }
