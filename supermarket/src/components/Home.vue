@@ -76,7 +76,7 @@ export default {
             { id: 3, name: '普通管理员', path: '/admininfo', icon: 'el-icon-menu' },
           ] },
         { id: 2, name: '供应商信息', path: '/supplier', icon: 'el-icon-chat-line-round'},
-        { id: 3, name: '商品信息', path: '/goods', icon: 'el-icon-box' },
+        { id: 3, name: '商品信息', path: '/category', icon: 'el-icon-box' },
         { id: 4, name: '进货订单信息', path: '/purchase', icon: 'el-icon-truck' },
         { id: 5, name: '销售订单信息', path: '/sales', icon: 'el-icon-tickets' },
         { id: 6, name: '财务报表', path: '/statistic', icon: 'el-icon-data-line'},

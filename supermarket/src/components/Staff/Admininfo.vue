@@ -40,6 +40,17 @@
           </template>
         </el-table-column>
       </el-table>
+
+      <!--分页区域-->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pagenum"
+        :page-sizes="[1, 2, 5, 10]"
+        :page-size="pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
     </el-card>
 
   <!-- 修改用户密码的对话框 -->
@@ -108,16 +119,7 @@
         <el-button type="primary" @click="addUser">确定</el-button>
       </span>
     </el-dialog>
-    <!--分页区域-->
-    <el-pagination
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="pagenum"
-      :page-sizes="[1, 2, 5, 10]"
-      :page-size="pagesize"
-      layout="total, sizes, prev, pager, next, jumper"
-      :total="total">
-    </el-pagination>
+
   </div>
 </template>
 
