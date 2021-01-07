@@ -67,7 +67,7 @@
           <el-input v-model="domain.value"  style="width: 60%;"></el-input>
           <el-button @click="removeDomain(domain)" style="margin-left: 10px" icon="el-icon-delete" type="warning" size="mini"></el-button>
         </el-form-item>
-        <el-button type="text" @click="addDomain" style="left: 50px;">＋ 添加同级分类</el-button>
+        <el-button type="text" @click="addDomain" style="left: 50px;" :disabled="this.tempForm.domains.length + this.tempForm.choseValue >= 3 ? true : false">＋ 添加子分类</el-button>
       </el-form>
       <span slot="footer" class="dialog-footer">
           <el-button @click="addCateSee = false">取消</el-button>
