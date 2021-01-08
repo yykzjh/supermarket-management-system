@@ -5,7 +5,7 @@ Description: 历史售出记录实体的方法接口
 '''
 
 from sqlalchemy import (or_, func, and_)
-from app.models import db, Order, to_json
+from app.models import db, Order, to_json, Category
 
 
 '''
@@ -26,3 +26,33 @@ def revenueInPeriod(startTime, endTime, goods):
         sum += record.amount * record.price
     
     return sum
+
+
+
+def addOrder(good_id, supplier_id, price, amount, datetime, id=0):
+    newOrder = []
+    if id != 0:
+        newOrder = Order(id=id, good_id=good_id, supplier_id=supplier_id, \
+                        price=price, amount=amount, datetime=datetime)
+    else:
+        newOrder = Order(good_id=good_id, supplier_id=supplier_id, \
+                        price=price, amount=amount, datetime=datetime)
+    
+    db.session.add(newOrder)
+    db.session.commit()
+    return newOrder.id
+
+
+def deleteOrder(order_id, good_id, supplier_id):
+    theOrder = Order.query.filter_by(id=order_id, good_id=good_id, supplier_id=supplier_id)
+    if theOrder == None:
+        return False
+    else:
+        db.session.delete(theOrder)
+        db.session.commit()
+        return True
+
+
+def selectOrders(id):
+    orders = to_json(Order.query.filter_by(id=id).all())
+    return orders

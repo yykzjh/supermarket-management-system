@@ -73,15 +73,19 @@
           const {data: res}  = await this.$http.post('/Users/Login', this.loginForm);
           console.log(res)
           // console.log(res);
-          if (res.StatusCode !== 200) return this.$message.error('登录失败')
-          this.$message.success('登陆成功')
+          if (res.StatusCode === 200){
+            this.$message.success('登陆成功')
+            window.sessionStorage.setItem('token', res.token);
+            window.sessionStorage.setItem('role_id', res.role_id);
+            this.$router.push('/home');
+          }
+          else
+            return this.$message.error('登录失败')
           // 1.将登陆成功之后的token，保存到客户端的sessionStorage中
           // 1.1 项目中除了登录之外其他的API接口，必须在登陆之后才能访问
           // 1.2 token只应在当前网站打开期间生效，所以将token保存在sessionStorage中
           // 2 通过编程式导航跳转到后台主页，路由地址是 /home
-          window.sessionStorage.setItem('token', res.token);
-          window.sessionStorage.setItem('role_id', res.role_id);
-          this.$router.push('/home');
+
         })
       }
     }

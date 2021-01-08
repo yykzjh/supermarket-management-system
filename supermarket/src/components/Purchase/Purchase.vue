@@ -4,7 +4,6 @@
 
 <script>
 export default {
-  name: '这是订单页面'
 }
 </script>
 

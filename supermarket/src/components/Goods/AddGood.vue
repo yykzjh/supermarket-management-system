@@ -2,7 +2,7 @@
   <div>
     <el-breadcrumb separator="/">
       <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
-      <el-breadcrumb-item>商品管理</el-breadcrumb-item>
+      <el-breadcrumb-item :to="{ path: '/category' }">商品管理</el-breadcrumb-item>
       <el-breadcrumb-item>添加商品</el-breadcrumb-item>
     </el-breadcrumb>
 
@@ -11,19 +11,19 @@
       <!--步骤条区域-->
       <el-steps :space="300" :active="activeIndex - 0" finish-status="success" align-center>
         <el-step title="基本信息"></el-step>
-        <el-step title="商品描述"></el-step>
         <el-step title="商品图片"></el-step>
+        <el-step title="商品描述"></el-step>
         <el-step title="完成"></el-step>
       </el-steps>
       <!--tab栏区域-->
-      <el-form :model="addForm" :rules="addFormRules" ref="ruleFormRef"
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef"
                label-position="top" label-width="100px" class="demo-ruleForm">
         <el-tabs v-model="activeIndex" :tab-position="'left'" :before-leave="beforeTabLeave">
           <el-tab-pane label="基本信息" name="0">
-            <el-form-item label="商品名称" prop="">
+            <el-form-item label="商品名称" prop="name">
               <el-input v-model="addForm.name"></el-input>
             </el-form-item>
-            <el-form-item label="商品种类">
+            <el-form-item label="商品种类" prop="parent">
               <el-cascader
                 v-model="addForm.parent" width="50px"
                 :options="cateList" @change="handleChange"
@@ -34,20 +34,13 @@
 
           <el-tab-pane label="商品图片" name="1">
             <!-- action表示图片要上传到的API地址-->
-            <el-upload
-              action="http://127.0.0.1:5000/Goods/NewGood"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove" :headers="headerObj"
-              list-type="picture" :on-success="handleSuccess">
-              <el-button size="small" type="primary">点击上传</el-button>
-              <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-            </el-upload>
+            <input type="file" name="icon" accept="image/gif,image/jpeg,image/jpg,image/png" @change="changeImage($event)" ref="avatarInput">
           </el-tab-pane>
 
           <el-tab-pane label="商品描述" name="2">
             <!--富文本编辑器-->
             <quill-editor v-model="addForm.intro"></quill-editor>
-            <el-button type="primary" @click="addGood">添加商品</el-button>
+            <el-button type="primary" @click="addGood" style="margin-top: 15px">添加商品</el-button>
           </el-tab-pane>
         </el-tabs>
       </el-form>
@@ -69,6 +62,8 @@
         choseValue: [],
         activeIndex: 0,
         addFormRules: {
+          name: [{required: true, message: '请输入商品名称', trigger: 'blur'}],
+          parent: [{required: true, message: '请选择商品种类', trigger: 'blur'}]
         },
         headerObj: { // 图片上传组件的header请求头
           Authorization: window.sessionStorage.getItem('token')
@@ -98,20 +93,6 @@
           return false
         }
       },
-      handlePreview(file) { // 预览图片
-        // console.log(file) // 可以看到图片的url
-        this.previewPath = file.response.data.url
-      },
-      handleRemove(file) { // 点击移除图片的动作
-        // console.log(file)
-        this.addForm.icon = ''
-      },
-      handleSuccess(response) { // 监听图片上传成功
-        // 1. 拼接得到一个图片信息对象
-        this.addForm.icon = response.data.tmp_path
-        // 2. 将图片信息对象push到pics数组中
-        console.log(this.addForm)
-      },
       // 设置只能选中三级分类添加商品
       setDisable (count, data, maxNum) {
         if (count > maxNum) {
@@ -134,9 +115,37 @@
         if(this.addForm.parent.length !== 3)
           this.addForm.parent = []
       },
+      // 修改商品图片的事件
+      changeImage(e){
+        var file = e.target.files[0]
+        var reader = new FileReader()
+        var that = this
+        reader.readAsDataURL(file)
+        reader.onload = function (e) {
+          that.addForm.icon = this.result
+        }
+      },
+      // 添加商品
       addGood() {
-        this.console(this.addForm)
-      }
+        console.log(this.addForm)
+        this.$refs.addFormRef.validate( async valid => {
+          if(!valid)
+            return this.$message.error('请填写所添加商品的必需信息')
+          else{
+            var form = { name: '', parent: [], intro: '', icon: ''}
+            form.name = this.addForm.name
+            form.parent = this.addForm.parent[this.addForm.parent.length-1]
+            form.intro = this.addForm.intro
+            form.icon = this.addForm.icon
+            console.log(form)
+            const {data: res} = await this.$http.post('/Goods/NewGood', form)
+            if(res.StatusCode !== 200)
+              return this.$message.error('增加商品信息失败')
+            else
+              this.$message.success('增加商品信息成功')
+          }
+        })
+      },
     }
   }
 </script>

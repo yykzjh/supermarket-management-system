@@ -52,7 +52,7 @@
     </el-card>
 
     <!--添加分类对话框-->
-    <el-dialog title="增加商品分类" :visible.sync="addCateSee" width="50%">
+    <el-dialog title="增加商品分类" :visible.sync="addCateSee" width="50%" @close="closeCatDialog">
       <el-form :model="tempForm" ref="tempFormRef" label-width="90px">
         <el-form-item label="父级分类">
           <el-cascader
@@ -67,7 +67,7 @@
           <el-input v-model="domain.value"  style="width: 60%;"></el-input>
           <el-button @click="removeDomain(domain)" style="margin-left: 10px" icon="el-icon-delete" type="warning" size="mini"></el-button>
         </el-form-item>
-        <el-button type="text" @click="addDomain" style="left: 50px;" :disabled="this.tempForm.domains.length + this.tempForm.choseValue >= 3 ? true : false">＋ 添加子分类</el-button>
+        <el-button type="text" @click="addDomain" style="left: 50px;" :disabled="this.tempForm.domains.length + this.tempForm.choseValue.length >= 3 ? true : false">＋ 添加子分类</el-button>
       </el-form>
       <span slot="footer" class="dialog-footer">
           <el-button @click="addCateSee = false">取消</el-button>
@@ -124,8 +124,10 @@ export default {
       if(index !== 0)
         this.tempForm.domains.splice(index, 1)
     },
-    changeHandle(){
-      console.log(this.choseValue)
+    closeCatDialog() {
+      this.$refs.tempFormRef.resetFields()
+      this.tempForm.choseValue = []
+      this.tempForm.domains = [{ value: '', key:  1}]
     },
     // 设置第四级分类，即商品不可选中
     setDisable (count, data, maxNum) {
@@ -152,18 +154,25 @@ export default {
       else{
         // console.log(this.tempForm)
         var len = this.tempForm.choseValue.length
-        this.addCateForm.pid = this.tempForm.choseValue[len-1]
+        if(len === 0)
+          this.addCateForm.pid = 0
+        else
+          this.addCateForm.pid = this.tempForm.choseValue[len-1]
         this.addCateForm.plevel = len
         for(let i=0; i<this.tempForm.domains.length; i++)
           this.addCateForm.name_list.push(this.tempForm.domains[i].value)
         // console.log(this.addCateForm)
         const {data: res} = await this.$http.post('/Goods/NewCats', this.addCateForm)
-        if(res.StatusCode !== 200)
+        if(res.StatusCode !== 200) {
           this.$message.error('增加商品分类失败')
+          console.log(this.addCateForm)
+        }
         else {
           this.$message.success('增加商品分类成功')
           this.addCateSee = false
           this.getGoodsList()
+          this.tempForm.domains = [{ value: '', key:  1}],
+          this.addCateForm.name_list = []
         }
       }
     },
