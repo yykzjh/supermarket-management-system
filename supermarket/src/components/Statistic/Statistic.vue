@@ -246,20 +246,38 @@ import '../../assets/css/charts.css'
                         type: 'bar',
                         stack: 'one',
                         emphasis: emphasisStyle,
-                        data: this.moneyOut
+                        data: this.moneyOut,
+                        markPoint: { // 标记点
+                            data: [
+                                { type: 'max', name: '最大值' },
+                                { type: 'min', name: '最小值' }
+                            ],
+                        },
+                        markLine: { // 标记线
+                            data: [ { type: 'average', name: '平均值' } ] 
+                        },
                     },{
                         name: '收入',
                         type: 'bar',
                         stack: 'one',
                         emphasis: emphasisStyle,
-                        data: this.moneyIn
+                        data: this.moneyIn,
+                        markPoint: { // 标记点
+                            data: [
+                                { type: 'max', name: '最大值' },
+                                { type: 'min', name: '最小值' }
+                            ],
+                        },
+                        markLine: { // 标记线
+                            data: [ { type: 'average', name: '平均值' } ] 
+                        },
                     },{
                         name: '收益',
                         type: 'line',
                         data: this.money,
                         lineStyle: {
                             color: '#2f4554'
-                        }
+                        },
                     }
                 ]
             }
