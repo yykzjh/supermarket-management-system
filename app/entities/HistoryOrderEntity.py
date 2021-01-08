@@ -55,7 +55,11 @@ def deleteOrder(order_id):
 
 
 def selectOrders():
-    orders = to_json(Order.query.all())
+    orders = Order.query.all()
+    if orders == None:
+        return None
+    else:
+        orders = to_json(orders)
     for order in orders:
         order['good_name'] = Category.query.get(order['good_id']).name
     return orders

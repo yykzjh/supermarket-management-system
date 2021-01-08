@@ -17,7 +17,10 @@ return {[Supplier]}
 '''
 def details():
     suppliers = Supplier.query.all()
-    return to_json(suppliers)
+    if suppliers == None:
+        return None
+    else:
+        return to_json(suppliers)
 
 
 def addSupplier(name, mobile, province, city, sign_start, sign_end):
@@ -56,8 +59,11 @@ def updateSupplier(id, name=None, mobile=None, province=None, city=None, sign_st
 
 
 def selectSupplier(supplier_id):
-    supplier = Supplier.query.get(supplier_id).to_dict()
-    return supplier
+    supplier = Supplier.query.get(supplier_id)
+    if supplier == None:
+        return None
+    else:
+        return supplier.to_dict()
 
 
 def divideProvince():
