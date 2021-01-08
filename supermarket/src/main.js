@@ -13,6 +13,12 @@ import axios from 'axios'
 
 // 导入商品分类列表中的tree-table
 import TreeTable from 'vue-table-with-tree-grid'
+// 导入商品添加功能中的富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
+import 'quill/dist/quill.core.css' // import styles
+import 'quill/dist/quill.snow.css' // for snow theme
+import 'quill/dist/quill.bubble.css' // for bubble theme
+
 
 // import 'jquery'
 import Echarts from 'echarts'
@@ -30,6 +36,7 @@ axios.interceptors.request.use(config => {
 Vue.prototype.$http = axios
 
 Vue.component('tree-table', TreeTable)
+Vue.use(VueQuillEditor)
 
 Vue.config.productionTip = false
 new Vue({
