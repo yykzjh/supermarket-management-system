@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.entities.GoodEntity import searchGoodsId
-from app.entities.HistoryOrderEntity import revenueInPeriod
+from app.entities.HistoryOrderEntity import revenueInPeriod, selectOrders
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -68,3 +68,11 @@ def revenueOfDivideTime():
     
     return jsonify(results=results)
 
+
+
+
+@app_history_orders.route("/AllHistoryOrders", methods=["GET"])
+def showHistoryOrders():
+    orders = selectOrders()
+    print(orders)
+    return jsonify("success!")

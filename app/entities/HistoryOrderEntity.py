@@ -53,6 +53,6 @@ def deleteOrder(order_id, good_id, supplier_id):
         return True
 
 
-def selectOrders(id):
-    orders = to_json(Order.query.filter_by(id=id).all())
+def selectOrders():
+    orders = to_json(Order.query.all())
     return orders
