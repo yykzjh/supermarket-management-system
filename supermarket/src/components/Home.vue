@@ -1,16 +1,9 @@
 <template>
   <el-container class="home-container">
     <!--头部区域-->
-    <el-header >
-      <div>
-        <img src="../assets/market.jpeg" alt="logo" class="imgg1">
-        <span>超市管理系统</span>
-      </div>
-      <div>
-        <img src="../assets/avater.gif" alt="avater" class="imgg2">
-        <el-button type="info" @click="logout">退出</el-button>
-      </div>
-    </el-header>
+    <!-- <el-header >
+      
+    </el-header> -->
     <!--页面主题区域-->
     <el-container>
       <!--侧边栏-->
@@ -55,7 +48,20 @@
             <i :class="item.icon"></i>
             <span slot="title">{{item.name}}</span>
           </el-menu-item>
+
+          <el-menu-item>
+            <div>
+              <img src="../assets/market.jpeg" alt="logo" class="imgg1">
+              <span>超市管理系统</span>
+            </div>
+            <div>
+              <img src="../assets/avater.gif" alt="avater" class="imgg2">
+              <el-button type="info" @click="logout">退出</el-button>
+            </div>
+          </el-menu-item>
+
         </el-menu>
+
       </el-aside>
       <!--右侧主体-->
       <el-main>
