@@ -43,16 +43,19 @@ def addOrder(good_id, supplier_id, price, amount, datetime, id=0):
     return newOrder.id
 
 
-def deleteOrder(order_id, good_id, supplier_id):
-    theOrder = Order.query.filter_by(id=order_id, good_id=good_id, supplier_id=supplier_id)
-    if theOrder == None:
+def deleteOrder(order_id):
+    orders = Order.query.filter_by(id=order_id).all()
+    if orders == None:
         return False
     else:
-        db.session.delete(theOrder)
+        for order in orders:
+            db.session.delete(order)
         db.session.commit()
         return True
 
 
 def selectOrders():
     orders = to_json(Order.query.all())
+    for order in orders:
+        order['good_name'] = Category.query.get(order['good_id']).name
     return orders
