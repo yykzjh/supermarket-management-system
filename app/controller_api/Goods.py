@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
-from app.entities.GoodEntity import searchGoodsId, categoryDetails, goodDetail, addNewCat, addNewGood
+from app.entities.GoodEntity import (searchGoodsId, categoryDetails, goodDetail, addNewCat, addNewGood,
+     deleteGood, deleteCat, catHaveChildren)
 from app.models import app
 import uuid
 import datetime
@@ -130,32 +131,36 @@ def insertNewGood():
         return jsonify(StatusCode=400)
 
 
-# '''
-# description: 预先上传商品图片
-# author: yykzjh
-# Date: 2021-01-07 21:59:18
-# param {商品图片:file} icon
-# return JSON {图片存储地址:str} tmp_path
-# '''
-# @app_goods.route("/GoodPicture", methods=["POST"])
-# def uploadGoodPicture():
-#     good_icon = request.files.get('icon') # 获取商品图片
+'''
+description: 删除指定id的商品
+author: yykzjh
+Date: 2021-01-08 19:58:56
+param {商品id:int} good_id
+return JSON {StatusCode:200/400, msg:"没有该商品！"}
+'''
+@app_goods.route("/DeleteGood", methods=["GET"])
+def removeGood():
+    good_id = request.args.get('good_id')
+    if deleteGood(good_id):
+        return jsonify(StatusCode=200)
+    else:
+        return jsonify(StatusCode=400, msg="没有该商品！")
 
-#     # 获取文件名
-#     icon_name = secure_filename(good_icon.filename)
 
-#     # 生成自定义图片名
-#     namespace = uuid.NAMESPACE_URL
-#     iconNewName = ''.join(str(uuid.uuid3(namespace, icon_name)).split('-')) + icon_name
-
-#     # 根据当前时间生成图片存储路径
-#     dateFile = datetime.datetime.now().strftime('%Y-%m-%d')
-#     path = dateFile + '/' + iconNewName
-#     adsolutePath = app.config['UPLOAD_FOLDER'] + '/' + dateFile
-    
-#     # 保存图片到生成的目录地址
-#     if not os.path.exists(adsolutePath):
-#         os.makedirs(adsolutePath)
-#     good_icon.save(app.config['UPLOAD_FOLDER'] + '/' + path)
-
-#     return jsonify(tmp_path=path)
+'''
+description: 删除指定分类
+author: yykzjh
+Date: 2021-01-08 20:14:16
+param {类别id:int} catId
+return JSON {StatusCode:200/400, msg:"该分类下还有子分类或商品！"/"没有该分类！"}
+'''
+@app_goods.route("/DeleteCat", methods=["GET"])
+def removeCat():
+    catId = request.args.get('catId')
+    if catHaveChildren(catId):
+        return jsonify(StatusCode=400, msg="该分类下还有子分类或商品！")
+    else:
+        if deleteCat(catId):
+            return jsonify(StatusCode=200)
+        else:
+            return jsonify(StatusCode=400, msg="没有该分类！")

@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.entities.GoodEntity import searchGoodsId
-from app.entities.HistoryOrderEntity import revenueInPeriod, selectOrders
+from app.entities.HistoryOrderEntity import revenueInPeriod, selectOrders, deleteOrder
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -70,9 +70,44 @@ def revenueOfDivideTime():
 
 
 
-
+'''
+description: 以购买人次为一行返回历史订单
+author: yykzjh
+Date: 2021-01-08 17:39:36
+param {无}
+return {orders:dict} dict:{int(order_id):{good_name, price, amount, datetime}}
+'''
 @app_history_orders.route("/AllHistoryOrders", methods=["GET"])
 def showHistoryOrders():
     orders = selectOrders()
-    print(orders)
-    return jsonify("success!")
+    
+    data = dict()
+    for order in orders: # 修改数据格式
+        data[order['id']] = data.setdefault(order['id'], dict(good_name="", price="", amount="", datetime=order['datetime'].strftime('%Y-%m-%d %H:%M:%S')))
+        data[order['id']]['good_name'] = data[order['id']]['good_name'] + "  " + order['good_name']
+        data[order['id']]['price'] = data[order['id']]['price'] + "  " + str(order['price'])
+        data[order['id']]['amount'] = data[order['id']]['amount'] + "  " + str(order['amount'])
+    
+    #去掉字符串最前面的空格
+    for value in data.values():
+        value['good_name'] = value['good_name'].lstrip()
+        value['price'] = value['price'].lstrip()
+        value['amount'] = value['amount'].lstrip()
+
+    return jsonify(orders=data)
+
+
+'''
+description: 删除指定编号的订单
+author: yykzjh
+Date: 2021-01-08 17:46:38
+param {订单id:int} order_id
+return JSON {StatusCode:200/400, msg:"没有该订单！"}
+'''
+@app_history_orders.route("/DeleteHistoryOrder", methods=["GET"])
+def deleteHistoryOrder():
+    order_id = request.args.get('order_id')
+    if deleteOrder(order_id):
+        return jsonify(StatusCode=200)
+    else:
+        return jsonify(StatusCode=400, msg="没有该订单！")

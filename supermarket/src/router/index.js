@@ -11,6 +11,7 @@ import Purchase from '../components/Purchase/Purchase'
 import Sales from '../components/Sales/Sales'
 import Statistic from '../components/Statistic/Statistic'
 import Admininfo from '../components/Staff/Admininfo'
+import AddGood from '../components/Goods/AddGood'
 
 import SupplierMap from '../components/Supplier/Map'
 
@@ -27,6 +28,7 @@ const routes = [
       // { path: '/supplier', component: Supplier },
       { path: '/supplier', component: SupplierMap },
       { path: '/category', component: Category },
+      { path: '/addgood', component: AddGood},
       { path: '/goodInfo', component: GoodInfo},
       { path: '/purchase', component: Purchase },
       { path: '/sales', component: Sales },
