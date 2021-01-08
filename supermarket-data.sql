@@ -51,7 +51,7 @@ CREATE TABLE `sms_cats` (
   `parent` int(11) DEFAULT NULL,
   `level` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=45 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -60,7 +60,7 @@ CREATE TABLE `sms_cats` (
 
 LOCK TABLES `sms_cats` WRITE;
 /*!40000 ALTER TABLE `sms_cats` DISABLE KEYS */;
-INSERT INTO `sms_cats` VALUES (1,'文具',0,1),(2,'日用品',0,1),(3,'笔',1,2),(4,'本子',1,2),(5,'铅笔',3,3),(6,'毛笔',3,3),(7,'自动铅笔',5,4),(8,'2B铅笔',5,4),(9,'硬毫狼毛笔',6,4),(10,'硬毫鹿毛笔',6,4),(11,'软毫狼毛笔',6,4),(12,'软毫鹿毛笔',6,4),(13,'硬壳本子',4,3),(14,'软壳本子',4,3),(15,'日记本',13,4),(16,'绘画本',13,4),(17,'草稿本',14,4),(18,'作业本',14,4),(19,'洗漱用品',2,2),(20,'清洁用品',2,2),(21,'牙刷',19,3),(22,'毛巾',19,3),(23,'电动牙刷',21,4),(24,'普通牙刷',21,4),(25,'面巾',22,4),(26,'浴巾',22,4),(27,'厨房清洁用品',20,3),(28,'厕所清洁用品',20,3),(29,'清洁剂',27,4),(30,'钢丝球',27,4),(31,'洗碗巾',27,4),(32,'洁厕灵',28,4),(33,'马桶刷',28,4),(34,'皮搋子',28,4);
+INSERT INTO `sms_cats` VALUES (1,'文具',0,1),(2,'日用品',0,1),(3,'笔',1,2),(4,'本子',1,2),(5,'铅笔',3,3),(6,'毛笔',3,3),(7,'自动铅笔',5,4),(8,'2B铅笔',5,4),(9,'硬毫狼毛笔',6,4),(10,'硬毫鹿毛笔',6,4),(11,'软毫狼毛笔',6,4),(12,'软毫鹿毛笔',6,4),(13,'硬壳本子',4,3),(14,'软壳本子',4,3),(15,'日记本',13,4),(16,'绘画本',13,4),(17,'草稿本',14,4),(18,'作业本',14,4),(19,'洗漱用品',2,2),(20,'清洁用品',2,2),(21,'牙刷',19,3),(22,'毛巾',19,3),(23,'电动牙刷',21,4),(24,'普通牙刷',21,4),(25,'面巾',22,4),(26,'浴巾',22,4),(27,'厨房清洁用品',20,3),(28,'厕所清洁用品',20,3),(29,'清洁剂',27,4),(30,'钢丝球',27,4),(31,'洗碗巾',27,4),(32,'洁厕灵',28,4),(33,'马桶刷',28,4),(34,'皮搋子',28,4),(35,'饮料',0,1),(36,'牛奶',35,2),(37,'纯牛奶',36,3),(44,'蒙牛纯牛奶',37,4);
 /*!40000 ALTER TABLE `sms_cats` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,7 +86,7 @@ CREATE TABLE `sms_goods` (
 
 LOCK TABLES `sms_goods` WRITE;
 /*!40000 ALTER TABLE `sms_goods` DISABLE KEYS */;
-INSERT INTO `sms_goods` VALUES (7,NULL,NULL),(8,NULL,NULL),(9,NULL,NULL),(10,NULL,NULL),(11,NULL,NULL),(12,NULL,NULL),(15,NULL,NULL),(16,NULL,NULL),(17,NULL,NULL),(18,NULL,NULL),(23,NULL,NULL),(24,NULL,NULL),(25,NULL,NULL),(26,NULL,NULL),(29,NULL,NULL),(30,NULL,NULL),(31,NULL,NULL),(32,NULL,NULL),(33,NULL,NULL),(34,NULL,NULL);
+INSERT INTO `sms_goods` VALUES (7,NULL,NULL),(8,NULL,NULL),(9,NULL,NULL),(10,NULL,NULL),(11,NULL,NULL),(12,NULL,NULL),(15,NULL,NULL),(16,NULL,NULL),(17,NULL,NULL),(18,NULL,NULL),(23,NULL,NULL),(24,NULL,NULL),(25,NULL,NULL),(26,NULL,NULL),(29,NULL,NULL),(30,NULL,NULL),(31,NULL,NULL),(32,NULL,NULL),(33,NULL,NULL),(34,NULL,NULL),(44,'蒙牛生产的纯牛奶','2021-01-08/0c51e555e0ed36d0bf32af726bc7d878蒙牛纯牛奶.jpg');
 /*!40000 ALTER TABLE `sms_goods` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -251,7 +251,7 @@ CREATE TABLE `sms_suppliers` (
   `city` varchar(64) NOT NULL,
   `province` varchar(64) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -260,7 +260,7 @@ CREATE TABLE `sms_suppliers` (
 
 LOCK TABLES `sms_suppliers` WRITE;
 /*!40000 ALTER TABLE `sms_suppliers` DISABLE KEYS */;
-INSERT INTO `sms_suppliers` VALUES (1,'浙江三禾竹木有限公司','12355757562','2014-08-01','2019-08-01','庆元县','浙江省'),(2,'景宁中信实业有限公司','17564546541','2018-12-22','2021-12-22','重庆市','重庆市');
+INSERT INTO `sms_suppliers` VALUES (1,'浙江三禾竹木有限公司','12355757562','2014-08-01','2019-08-01','庆元县','浙江省'),(2,'景宁中信实业有限公司','17564546541','2018-12-22','2021-12-22','重庆市','重庆市'),(3,'浙江凤阳山食品有限公司','14546543355','2019-05-22','2022-05-22','龙泉市','浙江省'),(4,'浙江晨光食品食品有限公司','18574566565','2015-12-11','2017-12-11','丽水市','浙江省'),(5,'浙江节节高炭业有限公司','12356565353','2017-01-15','2020-01-15','庆元县','浙江省');
 /*!40000 ALTER TABLE `sms_suppliers` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -306,4 +306,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-01-06 16:24:41
+-- Dump completed on 2021-01-08 16:21:40
