@@ -45,7 +45,7 @@ def addOrder(good_id, supplier_id, price, amount, datetime, id=0):
 
 def deleteOrder(order_id):
     orders = Order.query.filter_by(id=order_id).all()
-    if orders == None:
+    if len(orders) == 0:
         return False
     else:
         for order in orders:

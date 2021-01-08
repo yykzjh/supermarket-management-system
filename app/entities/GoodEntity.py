@@ -25,7 +25,6 @@ def searchGoodsId(cat_id):
 
     while True:
         preAllCatId = []
-        print(allCatId)
         for catId in allCatId:
             lowCatId = Category.query.with_entities(Category.id).filter(and_(Category.parent==catId, not_(Category.level==4))).all()
             lowCatId = [turple[0] for turple in lowCatId]
@@ -33,12 +32,10 @@ def searchGoodsId(cat_id):
             lowGoodsId = Category.query.with_entities(Category.id).filter(and_(Category.parent==catId, Category.level==4)).all()
             lowGoodsId = [turple[0] for turple in lowGoodsId]
             allGoodsId.extend(lowGoodsId)
-            print(allGoodsId)
         if preAllCatId:
             allCatId = preAllCatId
         else:
             break
-    print(allGoodsId)
     return allGoodsId
 
 
@@ -67,8 +64,11 @@ param {商品id:int} good_id
 return {Good}
 '''
 def goodDetail(good_id):
-    good = Good.query.get(good_id).to_dict()
-    return good
+    good = Good.query.get(good_id)
+    if good == None:
+        return None
+    else:
+        return good.to_dict()
 
 
 '''
@@ -141,7 +141,7 @@ def deleteGood(good_id):
 
 
 def catHaveChildren(catId):
-    children = Category.query.filter_by(parent=catId).all()
+    children = Category.query.filter_by(parent=catId).first()
     if children == None:
         return False
     else:
