@@ -884,8 +884,8 @@ export default [
         label: '辛集市'
       }
     ],
-    value: '河北省',
-    label: '河北省'
+    value: '河北',
+    label: '河北'
   },
   {
     children: [
@@ -1432,8 +1432,8 @@ export default [
         label: '吕梁市'
       }
     ],
-    value: '山西省',
-    label: '山西省'
+    value: '山西',
+    label: '山西'
   },
   {
     children: [
@@ -2412,8 +2412,8 @@ export default [
         label: '葫芦岛市'
       }
     ],
-    value: '辽宁省',
-    label: '辽宁省'
+    value: '辽宁',
+    label: '辽宁'
   },
   {
     children: [
@@ -2712,8 +2712,8 @@ export default [
         label: '延边朝鲜族自治州'
       }
     ],
-    value: '吉林省',
-    label: '吉林省'
+    value: '吉林',
+    label: '吉林'
   },
   {
     children: [
@@ -3308,8 +3308,8 @@ export default [
         label: '大兴安岭地区'
       }
     ],
-    value: '黑龙江省',
-    label: '黑龙江省'
+    value: '黑龙江',
+    label: '黑龙江'
   },
   {
     children: [
@@ -3846,8 +3846,8 @@ export default [
         label: '宿迁市'
       }
     ],
-    value: '江苏省',
-    label: '江苏省'
+    value: '江苏',
+    label: '江苏'
   },
   {
     children: [
@@ -4278,8 +4278,8 @@ export default [
         label: '丽水市'
       }
     ],
-    value: '浙江省',
-    label: '浙江省'
+    value: '浙江',
+    label: '浙江'
   },
   {
     children: [
@@ -4800,8 +4800,8 @@ export default [
         label: '宣城市'
       }
     ],
-    value: '安徽省',
-    label: '安徽省'
+    value: '安徽',
+    label: '安徽'
   },
   {
     children: [
@@ -5200,8 +5200,8 @@ export default [
         label: '宁德市'
       }
     ],
-    value: '福建省',
-    label: '福建省'
+    value: '福建',
+    label: '福建'
   },
   {
     children: [
@@ -5672,8 +5672,8 @@ export default [
         label: '上饶市'
       }
     ],
-    value: '江西省',
-    label: '江西省'
+    value: '江西',
+    label: '江西'
   },
   {
     children: [
@@ -6328,8 +6328,8 @@ export default [
         label: '菏泽市'
       }
     ],
-    value: '山东省',
-    label: '山东省'
+    value: '山东',
+    label: '山东'
   },
   {
     children: [
@@ -7072,8 +7072,8 @@ export default [
         label: '济源市'
       }
     ],
-    value: '河南省',
-    label: '河南省'
+    value: '河南',
+    label: '河南'
   },
   {
     children: [
@@ -7568,8 +7568,8 @@ export default [
         label: '神农架林区'
       }
     ],
-    value: '湖北省',
-    label: '湖北省'
+    value: '湖北',
+    label: '湖北'
   },
   {
     children: [
@@ -8146,8 +8146,8 @@ export default [
         label: '湘西土家族苗族自治州'
       }
     ],
-    value: '湖南省',
-    label: '湖南省'
+    value: '湖南',
+    label: '湖南'
   },
   {
     children: [
@@ -8750,8 +8750,8 @@ export default [
         label: '云浮市'
       }
     ],
-    value: '广东省',
-    label: '广东省'
+    value: '广东',
+    label: '广东'
   },
   {
     children: [
@@ -9402,8 +9402,8 @@ export default [
         label: '琼中黎族苗族自治县'
       }
     ],
-    value: '海南省',
-    label: '海南省'
+    value: '海南',
+    label: '海南'
   },
   {
     children: [
@@ -10424,8 +10424,8 @@ export default [
         label: '凉山彝族自治州'
       }
     ],
-    value: '四川省',
-    label: '四川省'
+    value: '四川',
+    label: '四川'
   },
   {
     children: [
@@ -10836,8 +10836,8 @@ export default [
         label: '黔南布依族苗族自治州'
       }
     ],
-    value: '贵州省',
-    label: '贵州省'
+    value: '贵州',
+    label: '贵州'
   },
   {
     children: [
@@ -11454,8 +11454,8 @@ export default [
         label: '迪庆藏族自治州'
       }
     ],
-    value: '云南省',
-    label: '云南省'
+    value: '云南',
+    label: '云南'
   },
   {
     children: [
@@ -12292,8 +12292,8 @@ export default [
         label: '商洛市'
       }
     ],
-    value: '陕西省',
-    label: '陕西省'
+    value: '陕西',
+    label: '陕西'
   },
   {
     children: [
@@ -12724,8 +12724,8 @@ export default [
         label: '甘南藏族自治州'
       }
     ],
-    value: '甘肃省',
-    label: '甘肃省'
+    value: '甘肃',
+    label: '甘肃'
   },
   {
     children: [
@@ -12950,8 +12950,8 @@ export default [
         label: '海西蒙古族藏族自治州'
       }
     ],
-    value: '青海省',
-    label: '青海省'
+    value: '青海',
+    label: '青海'
   },
   {
     children: [
@@ -13572,8 +13572,8 @@ export default [
     label: '新疆维吾尔自治区'
   },
   {
-    value: '台湾省',
-    label: '台湾省'
+    value: '台湾',
+    label: '台湾'
   },
   {
     value: '香港特别行政区',
