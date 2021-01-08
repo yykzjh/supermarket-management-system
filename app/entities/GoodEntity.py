@@ -3,8 +3,9 @@ Author: yykzjh
 Date: 2021-01-04 09:03:32
 Description: 商品实体的方法接口
 '''
+import os
 from sqlalchemy import (or_, func, not_, and_ ) 
-from app.models import db, Category, to_json, Good
+from app.models import db, app, Category, to_json, Good
 
 
 '''
@@ -115,4 +116,40 @@ def addNewGood(name, parent, intro, icon):
     db.session.commit()
 
     return True
+
+
+def deleteGood(good_id):
+    theGood = Good.query.get(good_id)
+    if theGood == None:
+        return False
+    else:
+        theCat = Category.query.get(good_id)
+        # 删除该商品的图片
+        file_path = app.config['UPLOAD_FOLDER'] + '/' + theGood.icon
+        if(os.path.exists(file_path)):
+        　　os.remove(file_path)
+
+        db.session.delete(theGood)
+        db.session.delete(theCat)
+        db.session.commit()
+        return True
+
+
+
+def catHaveChildren(catId):
+    children = Category.query.filter_by(parent=catId).all()
+    if children == None:
+        return False
+    else:
+        return True
+
+
+def deleteCat(catId):
+    theCat = Category.query.get(catId)
+    if theCat == None:
+        return False
+    else:
+        db.session.delete(theCat)
+        db.session.commit()
+        return True
 
