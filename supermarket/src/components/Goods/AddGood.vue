@@ -34,7 +34,15 @@
 
           <el-tab-pane label="商品图片" name="1">
             <!-- action表示图片要上传到的API地址-->
-            <input type="file" name="icon" accept="image/gif,image/jpeg,image/jpg,image/png" @change="changeImage($event)" ref="avatarInput">
+            <el-alert
+              type="warning" description="只能上传一张jpg/png文件，且不超过500kb" :closable="false">
+            </el-alert>
+            <div style="margin-top:15px; border:1px solid #ccc; border-radius: 5px;">
+              <el-button icon="el-icon-document-copy" type="primary" size="small" class="filebtn" @click="checkFile">选择文件</el-button>
+              <span> {{fileName}}</span>
+              <input type="file" id="fileinput" style="display: none;" @change="checkFileSure"/>
+            </div>
+
           </el-tab-pane>
 
           <el-tab-pane label="商品描述" name="2">
@@ -59,6 +67,7 @@
           intro: '',
           icon: '',
         },
+        fileName: '',
         choseValue: [],
         activeIndex: 0,
         addFormRules: {
@@ -116,14 +125,13 @@
           this.addForm.parent = []
       },
       // 修改商品图片的事件
-      changeImage(e){
-        var file = e.target.files[0]
-        var reader = new FileReader()
-        var that = this
-        reader.readAsDataURL(file)
-        reader.onload = function (e) {
-          that.addForm.icon = this.result
-        }
+      checkFile () {
+        document.querySelector('#fileinput').click()
+      },
+      checkFileSure (val) {
+        console.log(document.querySelector('#fileinput').files[0])
+        this.addForm.icon = document.querySelector('#fileinput').files[0]
+        this.fileName = document.querySelector('#fileinput').files[0].name
       },
       // 添加商品
       addGood() {
@@ -132,17 +140,25 @@
           if(!valid)
             return this.$message.error('请填写所添加商品的必需信息')
           else{
-            var form = { name: '', parent: [], intro: '', icon: ''}
-            form.name = this.addForm.name
-            form.parent = this.addForm.parent[this.addForm.parent.length-1]
-            form.intro = this.addForm.intro
-            form.icon = this.addForm.icon
-            console.log(form)
-            const {data: res} = await this.$http.post('/Goods/NewGood', form)
+            var formData = new FormData()
+            formData.append('name', this.addForm.name)
+            formData.append('parent', this.addForm.parent[this.addForm.parent.length-1])
+            formData.append('intro', this.addForm.intro)
+            formData.append('icon', this.addForm.icon)
+            const {data: res } = await this.$http.post('/Goods/NewGood', formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            })
             if(res.StatusCode !== 200)
               return this.$message.error('增加商品信息失败')
-            else
+            else {
               this.$message.success('增加商品信息成功')
+              this.$refs.addFormRef.resetFields()
+              this.addForm = { name: '', parent: [], intro: '', icon: ''}
+              this.$router.push('/category')
+            }
+
           }
         })
       },
@@ -151,5 +167,8 @@
 </script>
 
 <style lang="less" scoped>
+  .filebtn{
+    margin: 5px 10px;
+  }
 
 </style>
