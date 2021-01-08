@@ -22,18 +22,18 @@
             <el-row :class="['bdbottom', i1===0 ? 'bdtop': '', 'vcenter']" v-for="(item1, i1) in scope.row.children" :key="item1.id">
               <!--渲染一级商品分类-->
               <el-col :span="5">
-                <el-tag>{{item1.name}}</el-tag>
+                <el-tag :closable="item1.children.length == 0 ? true: false" @close="deleteCat(item1.id)">{{item1.name}}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
                 <!--渲染二级商品分类-->
                 <el-row :class="[i2 === 0 ? '' : 'bdtop', 'vcenter']" v-for="(item2, i2) in item1.children" :key="item2.id">
                   <el-col :span="6">
-                    <el-tag type="success">{{item2.name}}</el-tag>
+                    <el-tag type="success" :closable="item2.children.length == 0 ? true: false" @close="deleteCat(item2.id)">{{item2.name}}</el-tag>
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <el-col :span="18">
-                    <el-tag @click="jumpToInfo(item3.id)" type="warning" v-for="(item3, i3) in item2.children" :key="i3.id">
+                    <el-tag @click="jumpToInfo(item3.id)" type="warning" v-for="(item3, i3) in item2.children" :key="i3.id" closable @close="deleteGood(item3.id)">
                       {{item3.name}}</el-tag>
                   </el-col>
                 </el-row>
@@ -179,7 +179,27 @@ export default {
     // 添加商品，跳转至添加商品页面
     addGood(){
       this.$router.push('/addgood')
-    }
+    },
+    // 删除没有子分类的类别
+    async deleteCat(id){
+      const {data: res} = await this.$http.get('Goods/DeleteCat', {
+        params: {catId: id}
+      })
+      if(res.StatusCode !== 200)
+        return this.$message.error('删除分类失败')
+      else
+        return this.$message.success('删除分类成功')
+    },
+    // 删除商品
+    async deleteGood(id){
+      const {data: res} = await this.$http.get('Goods/DeleteGood', {
+        params: {good_id: id}
+      })
+      if(res.StatusCode !== 200)
+        return this.$message.error('删除商品失败')
+      else
+        return this.$message.success('删除商品成功')
+    },
   }
 }
 </script>
