@@ -106,25 +106,7 @@ def insertNewGood():
     good_name = request.form.get('name')
     good_parent = request.form.get('parent')
     good_intro = request.form.get('intro')
-    pic_path = request.form.get('picUrl')
-    
-    # 保存新商品信息到数据库
-    if addNewGood(good_name, good_parent, good_intro, pic_path):
-        return jsonify(StatusCode=200)
-    else: 
-        return jsonify(StatusCode=400)
-
-
-'''
-description: 预先上传商品图片
-author: yykzjh
-Date: 2021-01-07 21:59:18
-param {商品图片:file} icon
-return JSON {图片存储地址:str} tmp_path
-'''
-@app_goods.route("/GoodPicture", methods=["POST"])
-def uploadGoodPicture():
-    good_icon = request.files.get('icon') # 获取商品图片
+    good_icon = request.files.get('icon')
 
     # 获取文件名
     icon_name = secure_filename(good_icon.filename)
@@ -138,9 +120,42 @@ def uploadGoodPicture():
     path = dateFile + '/' + iconNewName
     adsolutePath = app.config['UPLOAD_FOLDER'] + '/' + dateFile
     
-    # 保存图片到生成的目录地址
-    if not os.path.exists(adsolutePath):
-        os.makedirs(adsolutePath)
-    good_icon.save(app.config['UPLOAD_FOLDER'] + '/' + path)
+    # 保存新商品信息到数据库
+    if addNewGood(good_name, good_parent, good_intro, path):
+        if not os.path.exists(adsolutePath):
+            os.makedirs(adsolutePath)
+        good_icon.save(app.config['UPLOAD_FOLDER'] + '/' + path)
+        return jsonify(StatusCode=200)
+    else: 
+        return jsonify(StatusCode=400)
 
-    return jsonify(tmp_path=path)
+
+# '''
+# description: 预先上传商品图片
+# author: yykzjh
+# Date: 2021-01-07 21:59:18
+# param {商品图片:file} icon
+# return JSON {图片存储地址:str} tmp_path
+# '''
+# @app_goods.route("/GoodPicture", methods=["POST"])
+# def uploadGoodPicture():
+#     good_icon = request.files.get('icon') # 获取商品图片
+
+#     # 获取文件名
+#     icon_name = secure_filename(good_icon.filename)
+
+#     # 生成自定义图片名
+#     namespace = uuid.NAMESPACE_URL
+#     iconNewName = ''.join(str(uuid.uuid3(namespace, icon_name)).split('-')) + icon_name
+
+#     # 根据当前时间生成图片存储路径
+#     dateFile = datetime.datetime.now().strftime('%Y-%m-%d')
+#     path = dateFile + '/' + iconNewName
+#     adsolutePath = app.config['UPLOAD_FOLDER'] + '/' + dateFile
+    
+#     # 保存图片到生成的目录地址
+#     if not os.path.exists(adsolutePath):
+#         os.makedirs(adsolutePath)
+#     good_icon.save(app.config['UPLOAD_FOLDER'] + '/' + path)
+
+#     return jsonify(tmp_path=path)

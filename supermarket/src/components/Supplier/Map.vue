@@ -74,7 +74,23 @@
       </el-form>
 
       <span slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="AddSupplier">确定</el-button>
+        <!-- <el-popconfirm
+          confirm-button-text='好的'
+          icon="el-icon-info"
+          icon-color="red"
+          title="请检查信息填写是否正确"
+          v-show="verifyCorrect">
+          <el-button type="primary" @click="AddSupplier" v-show="false"></el-button>
+        </el-popconfirm> -->
+        <!-- confirm-button-text='好的' -->
+        <el-popconfirm
+          icon="el-icon-info"
+          icon-color="blue"
+          :title=verifyCorrect>
+        <!-- slot="reference" 很重要 没有连按钮都不显示 -->
+          <el-button type="primary" slot="reference" @click="AddSupplier">确定</el-button>
+        </el-popconfirm>
+        <!-- <el-button type="primary" @click="AddSupplier">确定</el-button> -->
       </span>
     </el-dialog>
 
@@ -158,6 +174,7 @@ export default {
         address: [
           { type: 'array', required: true, message: '请选择地址', trigger: 'change'}], 
       },
+      verifyCorrect: '信息填写不合理，请检查一波',// 验证信息不合理弹出提示
     }
   },
   mounted() {
@@ -321,11 +338,50 @@ export default {
       this.addSupplierSee = state
       // alert(this.addSupplierSee)
     },
+    InitSupplier() {
+      this.addSupplierForm.name = ''
+      this.addSupplierForm.mobile= ''
+      this.addSupplierForm.address= '北京市 / 朝阳区'
+      this.addSupplierForm.sign_start= ''
+      this.addSupplierForm.sign_end= ''
+    },
     AddSupplier() {
-      // 添加成功关闭对话窗口
-      // this.ChangeAddState(false)
-      alert(12)
-      alert(this.addSupplierForm.address)
+      // alert(this.verifyCorrect)
+      // alert(this.addSupplierForm.address)
+      // 切分地址为省0、市1
+      var place = this.addSupplierForm.address.split('/');
+      for(var i = 0; i < place.length; i++) {
+        place[i] = place[i].trim()
+      }
+      // console.log(place)
+      const province = place[0]
+      const city = place[1]
+      // 检查填写数据是否合理
+      if(this.addSupplierForm.name=='') return
+      if(this.addSupplierForm.sign_start=='') return
+      if(this.addSupplierForm.end_start=='') return
+      // if( checkMobile(this.addSupplierForm.mobile)) this.verifyCorrect = true
+      console.log('content: ',this.addSupplierForm.name,this.addSupplierForm.sign_start,this.addSupplierForm.sign_end,this.addSupplierForm.mobile)
+
+      this.verifyCorrect = 'hrgfgjcns'
+      // else this.verifyCorrect = false //需要看一下不显示了但是是不是真的变成了false：不显示就是false
+      // var ret = await this.$http.post('/Suppliers/NewSupplier', {
+      //   'name': this.addSupplierForm.name,
+      //   'mobile': this.addSupplierForm.mobile,
+      //   'sign_start': this.addSupplierForm.sign_start,
+      //   'sign_end': this.addSupplierForm.sign_end,
+      //   'province': place[0],
+      //   'city': place[1]
+      // })
+      // if(ret.StatusCode !== 200)
+      //   this.$message.error('添加新供应商失败')
+      // else {
+      //   this.$message.success('添加供应商成功')
+      //   // 添加成功关闭对话窗口
+      //   // this.ChangeAddState(false)
+      //   // 清空addSupplierForm信息
+      //   this.InitSupplier()
+      // }
     }
   }
 }
