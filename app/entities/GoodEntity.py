@@ -6,6 +6,10 @@ Description: 商品实体的方法接口
 import os
 from sqlalchemy import (or_, func, not_, and_ ) 
 from app.models import db, app, Category, to_json, Good
+from app.entities.PurchaseOrderEntity import expenditureInPeriod
+from app.entities.HistoryOrderEntity import revenueInPeriod
+import datetime
+from dateutil.relativedelta import relativedelta
 
 
 '''
@@ -152,4 +156,31 @@ def deleteCat(catId):
         db.session.delete(theCat)
         db.session.commit()
         return True
+
+
+def searchNextCatId(catId):
+    cats = Category.query.filter_by(parent=catId).all()
+    catsIdList = []
+    for cat in cats:
+        catsIdList.append(cat.id)
+    return catsIdList
+
+
+def theCatFixProfit(catId):
+    # 获得该分类下所有商品id
+    goods = searchGoodsId(catId)
+    # 定义时间段
+    now_time = datetime.datetime.now()
+    before_day = now_time - datetime.timedelta(days=1)
+    before_month = now_time - relativedelta(months=+1)
+    before_year = now_time - relativedelta(years=+1)
+    # 计算不同时间段的利润
+    day_profit = revenueInPeriod(before_day, now_time, goods) - expenditureInPeriod(before_day, now_time, goods)
+    month_profit = revenueInPeriod(before_month, now_time, goods) - expenditureInPeriod(before_month, now_time, goods)
+    year_profit = revenueInPeriod(before_year, now_time, goods) - expenditureInPeriod(before_year, now_time, goods)
+
+    theCat = Category.query.get(catId)
+
+    return dict(id=theCat.id, name=theCat.name, parent=theCat.parent, level=theCat.level, 
+                day_profit=day_profit, month_profit=month_profit, year_profit=year_profit)
 
