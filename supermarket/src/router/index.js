@@ -24,7 +24,7 @@ const routes = [
       { path: '/welcome', component: Welcome },
       { path: '/superinfo', component: Superinfo },
       { path: '/admininfo', component: Admininfo },
-//       { path: '/supplier', component: Supplier },
+      // { path: '/supplier', component: Supplier },
       { path: '/supplier', component: SupplierMap },
       { path: '/category', component: Category },
       { path: '/goodInfo', component: GoodInfo},
