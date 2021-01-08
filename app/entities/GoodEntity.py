@@ -48,11 +48,7 @@ return {[dict]} dict:{id, name, parent, level}
 '''
 def categoryDetails(id):
     # 查询当前类别的子类别对象列表,并转换成子类型字典列表
-    children = Category.query.filter_by(parent=id).all()
-    if children == None:
-        return None
-    else:
-        children = to_json(children)
+    children = to_json(Category.query.filter_by(parent=id).all())
     # 遍历并进行递归
     for child in children:
         if child['level'] < 4:
@@ -145,7 +141,7 @@ def deleteGood(good_id):
 
 
 def catHaveChildren(catId):
-    children = Category.query.filter_by(parent=catId).all()
+    children = Category.query.filter_by(parent=catId).first()
     if children == None:
         return False
     else:

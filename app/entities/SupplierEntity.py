@@ -17,7 +17,7 @@ return {[Supplier]}
 '''
 def details():
     suppliers = Supplier.query.all()
-    if suppliers == None:
+    if len(suppliers) == 0:
         return None
     else:
         return to_json(suppliers)

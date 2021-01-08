@@ -45,7 +45,7 @@ def addOrder(good_id, supplier_id, price, amount, datetime, id=0):
 
 def deleteOrder(order_id):
     orders = Order.query.filter_by(id=order_id).all()
-    if orders == None:
+    if len(orders) == 0:
         return False
     else:
         for order in orders:
@@ -55,11 +55,7 @@ def deleteOrder(order_id):
 
 
 def selectOrders():
-    orders = Order.query.all()
-    if orders == None:
-        return None
-    else:
-        orders = to_json(orders)
+    orders = to_json(Order.query.all())
     for order in orders:
         order['good_name'] = Category.query.get(order['good_id']).name
     return orders

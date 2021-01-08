@@ -46,7 +46,6 @@ return {users:[User]}
 '''
 def details(role_name):
     role = Role.query.filter_by(name=role_name).first()
-    print(role)
     if role == None:
         return None
     else:
