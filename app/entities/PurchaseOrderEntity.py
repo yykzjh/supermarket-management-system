@@ -74,3 +74,5 @@ def goodPurchaseAmountInPeriod(good_id, start_time, end_time):
     return sum
 
 
+
+

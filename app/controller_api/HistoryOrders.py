@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app.entities.GoodEntity import searchGoodsId, goodIdToName
+from app.entities.GoodEntity import searchGoodsId, goodIdToName, topCats
 from app.entities.HistoryOrderEntity import (revenueInPeriod, selectOrders, deleteOrder, selectPriceList,
-    goodSaleAmountInPeriod)
+    goodSaleAmountInPeriod, goodsCountInPeriod)
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -157,3 +157,32 @@ def goodsSaleAmountInPeriod():
             value=goodSaleAmountInPeriod(goodId, start_time, end_time)))
     
     return jsonify(saleAmountList=saleAmountList)
+
+
+'''
+description: 以月为单位返回前六个月各顶级分类的购买次数
+author: yykzjh
+Date: 2021-01-09 19:00:43
+param {无}
+return JSON {data:[dict]} dict:{catId, name, data:[dict2]} dict2:{start_time, end_time, count}
+'''
+@app_history_orders.route("/TopCatsSaleCount", methods=["GET"])
+def topCatsSaleCount():
+    topCats = topCats()
+
+    data = []
+    now_time = datetime.datetime.now()
+    delta = relativedelta(months=+1)
+    for topCat in topCats:
+        tmpDict = dict(catId=topCat['id'], name=topCat['name'], data=[])
+        goods = searchGoodsId(topCat['id'])
+        date_time = now_time
+        for i in range(6):
+            tmpMonth = dict(start_time=date_time.strftime('%Y-%m-%d %H:%M:%S'), 
+                end_time=(date_time-delta).strftime('%Y-%m-%d %H:%M:%S'), 
+                count=goodsCountInPeriod(goods, date_time-delta, date_time))
+            tmpDict['data'].append(tmpMonth)
+            date_time -= delta
+        data.append(tmpDict)
+    return jsonify(data=data)
+
