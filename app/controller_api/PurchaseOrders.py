@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app.entities.GoodEntity import searchGoodsId
-from app.entities.PurchaseOrderEntity import expenditureInPeriod
+from app.entities.GoodEntity import searchGoodsId, goodIdToName
+from app.entities.PurchaseOrderEntity import (expenditureInPeriod, details, finishPurchaseOrder, selectlimitOrders,
+    selectPriceList, goodPurchaseAmountInPeriod)
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -89,4 +90,103 @@ def expenditureOfDivideTime():
         current_end = current_start + delta
     
     return jsonify(results=results)
+
+
+'''
+description: 返回所有订货订单
+author: yykzjh
+Date: 2021-01-09 16:12:54
+param {无}
+return {purchaseOrders:[dict]} dict:{good_id, good_name, supplier_id, build_time, finish_time, if_shelf, if_finish}
+'''
+@app_purchase_orders.route("/AllPurchaseOrders", methods=["GET"])
+def allPurchaseOrders():
+    purchaseOrders = details()
+    return jsonify(purchaseOrders=purchaseOrders)
+
+
+
+'''
+description: 修改进货订单状态为已完成
+author: yykzjh
+Date: 2021-01-09 16:28:34
+param {商品id:int} good_id
+param {供货商id:int} supplier_id
+param {建立订单时间:datetime} build_time
+return JSON {StatusCode:200/400, msg:"没有该订单！"/"该订单状态为已完成！"}
+'''
+@app_purchase_orders.route("/StatusToFinish", methods=["POST"])
+def statusToFinish():
+    info = request.get_json()
+    good_id = info.get('good_id')
+    supplier_id = info.get('supplier_id')
+    build_time = info.get('build_time')
+
+    flag = finishPurchaseOrder(good_id, supplier_id, build_time)
+    if flag == 0:
+        return jsonify(StatusCode=400, msg="没有该订单！")
+    elif flag == 1:
+        return jsonify(StatusCode=400, msg="该订单状态为已完成！")
+    else:
+        return jsonify(StatusCode=200)
     
+
+'''
+description: 返回一个分类id下的所有商品的进货订单
+author: yykzjh
+Date: 2021-01-09 16:38:01
+param {分类id:int} catId
+return {orders:[dict]} dict:{good_id, good_name, supplier_id, build_time, finish_time, if_shelf, if_finish}
+'''
+@app_purchase_orders.route("/CatPurchaseOrders", methods=["GET"])
+def catPurchaseOrders():
+    catId = request.args.get('catId')
+    goodsId = searchGoodsId(catId)
+
+    orders = selectlimitOrders(goodsId)
+    return jsonify(orders=orders)
+
+
+'''
+description: 返回某件商品一段时间内的进价变化数组
+author: yykzjh
+Date: 2021-01-09 17:19:27
+param {商品id:int} good_id
+param {起始时间:datetime} start_time
+param {终止时间:datetime} end_time
+return {priceList:[dict]} dict:{finish_time, price_in}
+'''
+@app_purchase_orders.route("/GoodPurchasePriceInPeriod", methods=["POST"])
+def goodPurchasePriceInPeriod():
+    info = request.get_json()
+    good_id = info.get('good_id')
+    start_time = info.get('start_time')
+    end_time = info.get('end_time')
+
+    priceList = selectPriceList(start_time, end_time, good_id)
+    return jsonify(priceList=priceList)
+
+
+'''
+description: 返回一定时间内指定分类下所有商品的进货数量
+author: yykzjh
+Date: 2021-01-09 17:44:57
+param {分类id:int} catId
+param {起始时间:datetime} start_time
+param {终止时间:datetime} end_time
+return {purchaseAmountList:[dict]} dict:{name, value}
+'''
+@app_purchase_orders.route("/GoodsPurchaseAmountInPeriod", methods=["POST"])
+def goodsPurchaseAmountInPeriod():
+    info = request.get_json()
+    catId = info.get('catId')
+    start_time = info.get('start_time')
+    end_time = info.get('end_time')
+    goodsId = searchGoodsId(catId)
+
+    purchaseAmountList = []
+    for goodId in goodsId:
+        purchaseAmountInPeriod.append(dict(name=goodIdToName(goodId), 
+            value=goodPurchaseAmountInPeriod(goodId, start_time, end_time)))
+    
+    return jsonify(purchaseAmountList=purchaseAmountList)

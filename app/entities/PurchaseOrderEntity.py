@@ -5,7 +5,7 @@ Description: 进货记录的方法接口
 '''
 
 from sqlalchemy import (or_, func, and_)
-from app.models import db, Purchase, to_json
+from app.models import db, Purchase, to_json, Good
 
 
 '''
@@ -26,4 +26,51 @@ def expenditureInPeriod(startTime, endTime, goods):
         sum += record.amount * record.price_in
     
     return sum
+
+
+def details():
+    purchaseOrders = to_json(Purchase.query.all())
+    for purchaseOrder in purchaseOrders:
+        purchaseOrder['good_name'] = Category.query.get(purchaseOrder['good_id']).name
+    return purchaseOrders
+
+
+def finishPurchaseOrder(good_id, supplier_id, build_time):
+    order = Purchase.query.filter_by(good_id=good_id, supplier_id=supplier_id, build_time=build_time).first()
+    if order == None:
+        return 0
+    elif order.if_finish == True:
+        return 1
+    else:
+        order.if_finish = True
+        db.session.commit()
+        return 2
+
+
+def selectlimitOrders(goodsId):
+    purchaseOrders = to_json(Purchase.query.filter(Purchase.good_id.in_(goodsId)).all())
+    for purchaseOrder in purchaseOrders:
+        purchaseOrder['good_name'] = Category.query.get(purchaseOrder['good_id']).name
+    return purchaseOrders
+
+
+def selectPriceList(start_time, end_time, good_id):
+    orders = Purchase.query.filter(and_(Purchase.good_id==good_id, Purchase.if_finish==True,
+        Purchase.finishtime>=start_time, Purchase.finishtime<end_time)).all()
     
+    priceList = []
+    for order in orders:
+        priceList.append(dict(finish_time=order.finishtime, price_in=order.price_in))
+    return priceList
+
+
+def goodPurchaseAmountInPeriod(good_id, start_time, end_time):
+    orders = Purchase.query.filter(and_(Purchase.good_id==good_id, Purchase.if_finish==True,
+        Purchase.finishtime>=start_time, Purchase.finishtime<end_time)).all()
+    
+    sum = 0.0
+    for order in orders:
+        sum += order.amount
+    return sum
+
+

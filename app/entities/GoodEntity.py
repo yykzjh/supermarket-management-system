@@ -20,6 +20,11 @@ param {分类id:int} cat_id
 return {该分类下所有商品id:[int]}
 '''
 def searchGoodsId(cat_id):
+    # 先判断cat_id是不是商品
+    originCat = Category.query.get(cat_id)
+    if originCat.level == 4:
+        return [cat_id]
+    
     allGoodsId = []
     allCatId = [cat_id]
 
@@ -128,10 +133,11 @@ def deleteGood(good_id):
         return False
     else:
         theCat = Category.query.get(good_id)
-        # 删除该商品的图片
-        file_path = app.config['UPLOAD_FOLDER'] + '/' + theGood.icon
-        if(os.path.exists(file_path)):
-            os.remove(file_path)
+        if theGood.icon != None:
+            # 删除该商品的图片
+            file_path = app.config['UPLOAD_FOLDER'] + '/' + theGood.icon
+            if(os.path.exists(file_path)):
+                os.remove(file_path)
 
         db.session.delete(theGood)
         db.session.delete(theCat)
@@ -183,4 +189,8 @@ def theCatFixProfit(catId):
 
     return dict(id=theCat.id, name=theCat.name, parent=theCat.parent, level=theCat.level, 
                 day_profit=day_profit, month_profit=month_profit, year_profit=year_profit)
+
+
+def goodIdToName(good_id):
+    return Good.query.get(good_id).name
 
