@@ -20,6 +20,11 @@ param {分类id:int} cat_id
 return {该分类下所有商品id:[int]}
 '''
 def searchGoodsId(cat_id):
+    # 先判断cat_id是不是商品
+    originCat = Category.query.get(cat_id)
+    if originCat.level == 4:
+        return [cat_id]
+    
     allGoodsId = []
     allCatId = [cat_id]
 
