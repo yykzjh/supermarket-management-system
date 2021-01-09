@@ -5,7 +5,7 @@ Description: 进货记录的方法接口
 '''
 
 from sqlalchemy import (or_, func, and_)
-from app.models import db, Purchase, to_json, Good
+from app.models import db, Purchase, to_json, Good, Category
 
 
 '''
