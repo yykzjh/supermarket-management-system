@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from app.entities.GoodEntity import searchGoodsId
-from app.entities.PurchaseOrderEntity import (expenditureInPeriod, details, finishPurchaseOrder, selectlimitOrders)
+from app.entities.PurchaseOrderEntity import (expenditureInPeriod, details, finishPurchaseOrder, selectlimitOrders,
+    selectPriceList)
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -144,3 +145,23 @@ def catPurchaseOrders():
 
     orders = selectlimitOrders(goodsId)
     return jsonify(orders=orders)
+
+
+'''
+description: 返回某件商品一段时间内的价格变化数组
+author: yykzjh
+Date: 2021-01-09 17:19:27
+param {商品id:int} good_id
+param {起始时间:datetime} start_time
+param {终止时间:datetime} end_time
+return {priceList:[dict]} dict:{finish_time, price_in}
+'''
+@app_purchase_orders.route("/GoodPurchasePriceInPeriod", methods=["POST"])
+def goodPurchasePriceInPeriod():
+    info = request.get_json()
+    good_id = info.get('good_id')
+    start_time = info.get('start_time')
+    end_time = info.get('end_time')
+
+    priceList = selectPriceList(start_time, end_time, good_id)
+    return jsonify(priceList=priceList)

@@ -52,4 +52,14 @@ def selectlimitOrders(goodsId):
     for purchaseOrder in purchaseOrders:
         purchaseOrder['good_name'] = Category.query.get(purchaseOrder['good_id']).name
     return purchaseOrders
+
+
+def selectPriceList(start_time, end_time, good_id):
+    orders = Purchase.query.filter(and_(Purchase.good_id==good_id, Purchase.if_finish==True,
+        Purchase.finishtime>=start_time, Purchase.finishtime<end_time)).all()
+    
+    priceList = []
+    for order in orders:
+        priceList.append(dict(finish_time=order.finishtime, price_in=order.price_in))
+    return priceList
     
