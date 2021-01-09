@@ -535,6 +535,7 @@ export default {
       // alert(this.verifyCorrect)
       // alert(this.addSupplierForm.address)
       var place = null
+      // var addressTemp =
       // 切分地址为省0、市1
       if(typeof(this.addSupplierForm.address) == "string") {
         place = (this.addSupplierForm.address).split('/');
@@ -576,23 +577,26 @@ export default {
       else {
         this.verifyCorrect = '添加供应商成功'
         this.$message.success('添加供应商成功')
-        // 清空addSupplierForm信息
-        this.InitSupplier()
         // 添加成功关闭对话窗口
         this.ChangeAddState(false)
 
         this.getPlaceData(province, city, 'add')
+
+        // 新增供货商 更新列表
+        this.supplierList.push({
+          'name': this.addSupplierForm.name,
+          'mobile': this.addSupplierForm.mobile,
+          'sign_start': this.addSupplierForm.sign_start,
+          'sign_end': this.addSupplierForm.sign_end,
+          'province': province,
+          'city': city,
+          'area': province + city,
+          'isEdit': false
+        })
+        // console.log(this.supplierList)
+        // 清空addSupplierForm信息
+        this.InitSupplier()
       }
-      // 新增供货商 更新列表
-      this.supplierList.push({
-        'name': this.addSupplierForm.name,
-        'mobile': this.addSupplierForm.mobile,
-        'sign_start': this.addSupplierForm.sign_start,
-        'sign_end': this.addSupplierForm.sign_end,
-        'province': province,
-        'city': city,
-        'isEdit': false
-      })
     },
     async AllSupplier() {
       var ret = await this.$http.get('/Suppliers/SuppliersInfo')
@@ -688,7 +692,7 @@ export default {
         })
         if (mess.StatusCode !== 200) return this.$message.error(mess.msg)
         else {
-          if(this.DeteleSupplierFromList(id)) this.$message.success('修改供货商信息成功')
+          // if(this.DeteleSupplierFromList(id)) this.$message.success('修改供货商信息成功')
         }
       }
     },
