@@ -133,10 +133,11 @@ def deleteGood(good_id):
         return False
     else:
         theCat = Category.query.get(good_id)
-        # 删除该商品的图片
-        file_path = app.config['UPLOAD_FOLDER'] + '/' + theGood.icon
-        if(os.path.exists(file_path)):
-            os.remove(file_path)
+        if theGood.icon != None:
+            # 删除该商品的图片
+            file_path = app.config['UPLOAD_FOLDER'] + '/' + theGood.icon
+            if(os.path.exists(file_path)):
+                os.remove(file_path)
 
         db.session.delete(theGood)
         db.session.delete(theCat)
