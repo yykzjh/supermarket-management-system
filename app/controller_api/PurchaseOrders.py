@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.entities.GoodEntity import searchGoodsId
-from app.entities.PurchaseOrderEntity import expenditureInPeriod
+from app.entities.PurchaseOrderEntity import (expenditureInPeriod, details, finishPurchaseOrder, selectlimitOrders)
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -89,4 +89,58 @@ def expenditureOfDivideTime():
         current_end = current_start + delta
     
     return jsonify(results=results)
+
+
+'''
+description: 返回所有订货订单
+author: yykzjh
+Date: 2021-01-09 16:12:54
+param {无}
+return {purchaseOrders:[dict]} dict:{good_id, good_name, supplier_id, build_time, finish_time, if_shelf, if_finish}
+'''
+@app_purchase_orders.route("/AllPurchaseOrders", methods=["GET"])
+def allPurchaseOrders():
+    purchaseOrders = details()
+    return jsonify(purchaseOrders=purchaseOrders)
+
+
+
+'''
+description: 修改进货订单状态为已完成
+author: yykzjh
+Date: 2021-01-09 16:28:34
+param {商品id:int} good_id
+param {供货商id:int} supplier_id
+param {建立订单时间:datetime} build_time
+return JSON {StatusCode:200/400, msg:"没有该订单！"/"该订单状态为已完成！"}
+'''
+@app_purchase_orders.route("/StatusToFinish", methods=["POST"])
+def statusToFinish():
+    info = request.get_json()
+    good_id = info.get('good_id')
+    supplier_id = info.get('supplier_id')
+    build_time = info.get('build_time')
+
+    flag = finishPurchaseOrder(good_id, supplier_id, build_time)
+    if flag == 0:
+        return jsonify(StatusCode=400, msg="没有该订单！")
+    elif flag == 1:
+        return jsonify(StatusCode=400, msg="该订单状态为已完成！")
+    else:
+        return jsonify(StatusCode=200)
     
+
+'''
+description: 返回一个分类id下的所有商品的进货订单
+author: yykzjh
+Date: 2021-01-09 16:38:01
+param {分类id:int} catId
+return {orders:[dict]} dict:{good_id, good_name, supplier_id, build_time, finish_time, if_shelf, if_finish}
+'''
+@app_purchase_orders.route("/CatPurchaseOrders", methods=["GET"])
+def catPurchaseOrders():
+    catId = request.args.get('catId')
+    goodsId = searchGoodsId(catId)
+
+    orders = selectlimitOrders(goodsId)
+    return jsonify(orders=orders)
