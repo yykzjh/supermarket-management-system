@@ -22,9 +22,9 @@
       <el-card class="box-card">
         <!--按钮区域-->
         <el-row :gutter="20">
-          <el-col :span="8">
+          <el-col :span="10">
             <el-input placeholder="请输入名称或电话或商品编号" v-model="inputCondition" clearable>
-              <el-button slot="append" icon="el-icon-search"></el-button>
+              <el-button slot="append" icon="el-icon-search" @click="ScreenSupplier"></el-button>
             </el-input>
           </el-col>
 
@@ -32,24 +32,97 @@
             <!-- <el-button class="gutter" type="primary" @click="addUserSee = true">添加供应商</el-button> -->
           <!-- </el-col> -->
           <el-col :span="3">
-            <el-button icon="el-icon-download" circle></el-button>
+            <el-button icon="el-icon-download" circle @click="downExcel" :loading="downloadLoading"></el-button>
             <!-- <el-button class="gutter" type="primary" @click="downExcel" :loading="downloadLoading">下载表格</el-button> -->
           </el-col>
         </el-row>
         <!--供应商列表-->
-        <el-table>
+        <el-table :data="supplierList.slice((pageNum-1)*pageSize, pageNum*pageSize)" stripe>
           <el-table-column type="index"></el-table-column>
-          <el-table-column label="名称" prop="name"></el-table-column>
-          <el-table-column label="电话" prop="mobile"></el-table-column>
-          <el-table-column label="地区" prop="area"></el-table-column>
-          <el-table-column label="供应项目" prop="provide"></el-table-column>
+          <el-table-column label="名称" prop="name">
+            <template slot-scope="scope">
+              <el-input
+                v-show="scope.row.isEdit"
+                v-model="scope.row.name">
+              </el-input>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.name}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="电话" prop="mobile">
+            <template slot-scope="scope">
+              <el-input
+                v-show="scope.row.isEdit"
+                v-model="scope.row.mobile">
+              </el-input>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.mobile}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="地区" prop="area">
+            <template slot-scope="scope">
+              <el-cascader class="width"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.area"
+                :options="cityData"
+                :props="{ expandTrigger: 'hover',value:'value',label:'label',children:'children' }">
+              </el-cascader>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.area}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="合作起始日期" prop="sign_start">
+            <template slot-scope="scope">
+              <el-date-picker
+                value-format="yyyy-MM-dd"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.sign_start"
+                type="date"/>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.sign_start}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="截止日期" prop="sign_end">
+            <template slot-scope="scope">
+              <el-date-picker
+                value-format="yyyy-MM-dd"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.sign_end"
+                type="date"/>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.sign_end}}
+              </span>
+            </template>
+          </el-table-column>
+          <!-- <el-table-column label="供应项目" prop="provide"></el-table-column> -->
           <el-table-column label="可执行操作">
-            <template>
-              <el-button type="primary" icon="el-icon-edit" size="mini"></el-button>
-              <el-button type="danger" icon="el-icon-delete" size="mini" ></el-button>
+            <template slot-scope="scope">
+              <el-button type="close" icon="el-icon-close" size="mini" @click="CancleEdit(scope.row)" v-show="scope.row.isEdit"></el-button>
+              <el-button type="success" icon="el-icon-check" size="mini" @click="SaveChange(scope.row)" v-show="scope.row.isEdit"></el-button>
+              <el-button type="primary" icon="el-icon-edit" size="mini" @click="ShowEditDialog(scope.row)" v-show="!scope.row.isEdit"></el-button>
+              <!-- <el-button disabled type="primary" icon="el-icon-edit" size="mini" @click="ShowEditDialog(scope.row)" v-show="!scope.row.isEdit"></el-button> -->
+              <el-button type="danger" icon="el-icon-delete" size="mini" @click="DeleteSupplier(scope.row.id)" v-show="!scope.row.isEdit"></el-button>
             </template>
           </el-table-column>
         </el-table>
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="pageNum"
+          :page-sizes="[1, 2, 5, 10]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pageTotal">
+        </el-pagination>
       </el-card>
     </div>
     <el-dialog title="新增供货商" :visible.sync="addSupplierSee" width="50%" @close="ChangeAddState(false)">
@@ -94,17 +167,28 @@
       </span>
     </el-dialog>
 
-    <el-drawer :title="drawerTitle" :visible.sync="drawer" >
-      <!-- <el-collapse :v-model="activeName" accordion class="el-collapse-map">
-        <el-collapse-item title="" :name=1>
-        </el-collapse-item>
-        <el-collapse-item title="" :name=2>
-        </el-collapse-item>
-        <el-collapse-item title="" :name=3>
-        </el-collapse-item>
-        <el-collapse-item title="" :name=4>
-        </el-collapse-item>
-      </el-collapse> -->
+    <el-drawer
+      :title="drawerTitle"
+      :visible.sync="drawer"
+      size="50%">
+      <el-table
+        :data="regionSupplierList"
+        stripe
+        style="margin-top:-15px;">
+        <el-table-column type="index"></el-table-column>
+        <el-table-column label="名称" prop="name"></el-table-column>
+        <el-table-column label="电话" prop="mobile"></el-table-column>
+        <el-table-column label="地区" prop="area"></el-table-column>
+        <el-table-column label="合作起始日期" prop="sign_start"></el-table-column>
+        <el-table-column label="截止日期" prop="sign_end"></el-table-column>
+        <!-- <el-table-column label="供应项目" prop="provide"></el-table-column> -->
+        <el-table-column label="可执行操作">
+          <template slot-scope="scope">
+            <el-button type="primary" icon="el-icon-edit" circle size="mini" @click="ShowEditDialog(scope.row)"></el-button>
+            <el-button type="danger" icon="el-icon-delete" circle size="mini" @click="DeleteSupplier(scope.row.id)"></el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </el-drawer>
   </div>
 </template>
@@ -114,6 +198,7 @@
 import '../../assets/css/charts.css'
 // 导入省份中文拼音map
 import {getProvinceMapInfo} from '@/vender/map_utils'
+// import {Excel} from "@/vender/Export2Excel"
 import cityData from '@/vender/citydata'
 // 局部引用
 import axios from 'axios'
@@ -122,6 +207,7 @@ export default {
     var checkMobile = (rule, value, callback) => {
       var regMobile = /^1\d{10}$/;// \d是现代正则表达式的简写[0-9]
       var regTelephone = /^\d{7}(?:\d{1})?$/ ;// 固定电话的区号为一般为4位，少数为3位（如北京，上海等）号码一般为7位或8位
+      // console.log(12345678)
       if (regMobile.test(value) || regTelephone.test(value))
         return callback()
       else
@@ -134,12 +220,29 @@ export default {
       mapData: [],
       // 当前地图等级 1省 2市
       nowPosition: null,
+      nowPlace: null,
       // numSupplier: [],
       timesMax: 20,
-      timesData: [
-        {name:'北京', value: 15},
-        {name:'江苏', value: 4}
-      ],
+      timesData: {
+        "中国":[
+          { "name": "北京", "value": 15 },
+          { "name": "河北", "value": 8 }
+        ],
+        "北京":[
+            { "name": "朝阳区", "value": 4 },
+            { "name": "昌平区", "value": 11 }
+        ],
+        "河北":[
+            { "name": "张家口市", "value": 2 },
+            { "name": "唐山市", "value": 6 }
+        ]
+      },
+      suplliersIncity: {
+        "昌平区": [
+          {id: 101, name: '我们做得很好',  mobile: '12345678', area: '上海 普陀区 金沙江路 1518 弄', sign_start: '2020-01-08', sign_end: '2050-01-08'},
+          {id: 102,  name: '液氮供不完大公司', mobile: '04511432', area: '北京 朝阳区', sign_start: '2019-12-12', sign_end: '2077-01-01'}
+        ]
+      },
       drawer: false,
       activeName: 1,
       drawerTitle: null,
@@ -154,7 +257,7 @@ export default {
         mobile: '',
         // province: '',
         // city: '',
-        address: '北京市 / 朝阳区',
+        address: '北京 / 朝阳区',
         sign_start: '',
         sign_end: '',
       },
@@ -168,23 +271,37 @@ export default {
           { validator: checkMobile, trigger: 'blur' }],
         sign_start: [
           // blur失去焦点，change数据改变
-          { required: true, message: '请输入合约开始日期', trigger: 'blur'}],
+          { required: true, message: '请输入合约开始日期', trigger: 'blur'},
+          { required: true, message: '请输入合约开始日期', trigger: 'change'}],
         sign_end: [
-          { required: true, message: '请输入合约截止日期', trigger: 'blur'}],
+          { required: true, message: '请输入合约截止日期', trigger: 'blur'},
+          { required: true, message: '请输入合约截止日期', trigger: 'change'}],
         address: [
           { type: 'array', required: true, message: '请选择地址', trigger: 'change'}], 
       },
-      verifyCorrect: '信息填写不合理，请检查一波',// 验证信息不合理弹出提示
+      verifyCorrect: '',// 验证信息&弹出提示
+
+      // 供应商列表
+      supplierList: [],
+      regionSupplierList: [],
+      citysTemp: null,// 暂存place Json{name, value}
+      pageSize: 5,
+      pageNum: 1,
+      pageTotal: 0,
+      downloadLoading: false,
+      initUpdateVal: ''
     }
   },
   mounted() {
     this.initChart()
-    // this.getData()
+    this.getGlobalData()// timesData
+    this.AllSupplier()
     window.addEventListener('resize', this.screenAdapter)
     this.screenAdapter()// 初始效果
   },
   methods: {
     async initChart() {
+      // console.log('chart',this.timesData["中国"])
       this.chartInstance = this.$echarts.init(this.$refs.map_ref)
       const ChinaJson = await axios.get('http://localhost:8080/static/map/China.json')
       // console.log(ChinaJson)
@@ -213,7 +330,7 @@ export default {
         },
         series: [
           {
-            data: this.timesData,
+            data: this.timesData["中国"],
             geoIndex: 0,// 关联series和geo0
             type: 'map'
           }
@@ -240,10 +357,11 @@ export default {
       }
       this.chartInstance.setOption(initOption)
       this.nowPosition = 1
+      this.nowPlace = '中国'
       // **************地图点击事件**************
       // 点击进入某省
       this.chartInstance.on('click', async (arg)=>{
-        // 判断当前是否是China 可进入下一级查询
+        // 判断当前是否是China1 可进入下一级查询
         if (this.nowPosition != 1) {
           // 具体某个省直接显示该省下所有供应商
           // console.log(arg.name)
@@ -251,10 +369,10 @@ export default {
           return
         }
         this.nowPosition = 2
-        // console.log(arg)
+        this.nowPlace = arg.name
         // 中文省份对应拼音 map
         const provinceIfo = getProvinceMapInfo(arg.name)
-        // console.log(provinceIfo)
+        // console.log(arg.name)
         if (!this.mapData[provinceIfo.key]) {
           // alert(12345)
           const regionJson = await axios.get('http://localhost:8080/'+provinceIfo.path)
@@ -266,12 +384,21 @@ export default {
         const newOption = {
           title: {
             text: arg.name+'供应商分布',
-            subtext: '双击返回大地图'
+            subtext: '双击空白区域返回大地图'
           },
           geo: {
-            map: provinceIfo.key
+            map: provinceIfo.key,
+            zoom: 1.2
           },
+          series: [
+            {
+              data: this.timesData[arg.name],
+              // geoIndex: 0,// 关联series和geo0
+              // type: 'map'
+            }
+          ],
         }
+        // console.log(arg.name,provinceIfo.key)
         this.chartInstance.setOption(newOption)
       })
       // 监听双击dbclick返回China
@@ -284,13 +411,21 @@ export default {
         },
         geo: {
           map: 'China',
+          zoom: 1
           // center: []
-        }
+        },
+        series: [
+          {
+            data: this.timesData["中国"],
+            // geoIndex: 0,// 关联series和geo0
+            // type: 'map'
+          }
+        ],
       }
       this.chartInstance.setOption(returnOption)
       this.nowPosition = 1
     },
-    getData() {
+    async getGlobalData() {
       // 基于前端vue环境 http://localhost:8080/static/map/China.json
       // Promise对象await解析 async
       
@@ -304,12 +439,55 @@ export default {
       // this.$http.get('src/assets/json/China.json').then(function(res){
       //     console.log(res);
       // });
-
+      // console.log(this.timesData)
+      var ret = await this.$http.get('/Suppliers/StatisticInfo')
+      if(ret.status !== 200)
+        this.$message.error('Network 获取供应商数量分布失败')
+      else {
+        ret = ret.data
+        this.timesData = ret.data
+        // console.log(this.timesData["中国"])
+        this.updateChart('中国')
+      }
     },
-    // 更新图表
-    updateChart() {
+    UpdateCitysValue(ops, place) {
+      for (var i in this.citysTemp) {
+        if(this.citysTemp[i]['name'] == place){
+          this.citysTemp[i]['value'] = this.citysTemp[i]['value'] + ops
+          break
+        }
+      }
+    },
+    getPlaceData(province, city, op) {
+      this.citysTemp = null
+      var ops = null
+      if(op == 'add') {
+        ops = 1
+        this.citysTemp = this.timesData['中国']
+        this.UpdateCitysValue(ops, province)
 
-      const newOption = {}
+        this.citysTemp = this.timesData[province]
+        this.UpdateCitysValue(ops, city)
+        
+      } else if(op == 'delete') {
+        ops = -1
+        this.citysTemp = this.timesData['中国']
+        this.UpdateCitysValue(ops, province)
+
+        this.citysTemp = this.timesData[province]
+        this.UpdateCitysValue(ops, city)
+      }
+      this.updateChart(this.nowPlace)
+    },
+    // 更新当前地理位置图表
+    updateChart(place) {
+      const newOption = {
+        series: [
+          {
+            data: this.timesData[place]
+          }
+        ],
+      }
       this.chartInstance.setOption(newOption)
     },
     screenAdapter() {
@@ -326,7 +504,13 @@ export default {
       this.chartInstance.resize()
     },
     SuppliersDrawer(cityName) {
-      console.log(cityName)
+      // console.log(cityName)
+      if ( !this.suplliersIncity[cityName]) {
+        console.log('nothing')
+        // 根据城市名 请求该城市下所有供应商信息
+
+      }
+      this.regionSupplierList = this.suplliersIncity[cityName]
       this.drawer = true
       this.drawerTitle = cityName
     },
@@ -341,48 +525,267 @@ export default {
     InitSupplier() {
       this.addSupplierForm.name = ''
       this.addSupplierForm.mobile= ''
-      this.addSupplierForm.address= '北京市 / 朝阳区'
+      this.addSupplierForm.address= '北京 / 朝阳区'
       this.addSupplierForm.sign_start= ''
       this.addSupplierForm.sign_end= ''
     },
-    AddSupplier() {
+    async AddSupplier() {
+      var regMobile = /^1\d{10}$/;
+      var regTelephone = /^\d{7}(?:\d{1})?$/;
       // alert(this.verifyCorrect)
       // alert(this.addSupplierForm.address)
+      var place = null
       // 切分地址为省0、市1
-      var place = this.addSupplierForm.address.split('/');
-      for(var i = 0; i < place.length; i++) {
-        place[i] = place[i].trim()
+      if(typeof(this.addSupplierForm.address) == "string") {
+        place = (this.addSupplierForm.address).split('/');
+        for(var i = 0; i < place.length; i++) {
+          place[i] = place[i].trim()
+        }
+        // console.log(place)
+      } else {
+        place = this.addSupplierForm.address
       }
       // console.log(place)
       const province = place[0]
       const city = place[1]
       // 检查填写数据是否合理
-      if(this.addSupplierForm.name=='') return
-      if(this.addSupplierForm.sign_start=='') return
-      if(this.addSupplierForm.end_start=='') return
-      // if( checkMobile(this.addSupplierForm.mobile)) this.verifyCorrect = true
-      console.log('content: ',this.addSupplierForm.name,this.addSupplierForm.sign_start,this.addSupplierForm.sign_end,this.addSupplierForm.mobile)
+      if(this.addSupplierForm.name=='' || 
+        this.addSupplierForm.sign_start=='' || 
+        this.addSupplierForm.end_start=='' ||
+        (!(regMobile.test(this.addSupplierForm.mobile) || regTelephone.test(this.addSupplierForm.mobile))) ) {
+        this.verifyCorrect = '信息填写不合理，请检查一波'
+        return
+      }
+      // console.log('content: ',this.addSupplierForm.name,this.addSupplierForm.sign_start,this.addSupplierForm.sign_end,this.addSupplierForm.mobile)
 
-      this.verifyCorrect = 'hrgfgjcns'
-      // else this.verifyCorrect = false //需要看一下不显示了但是是不是真的变成了false：不显示就是false
-      // var ret = await this.$http.post('/Suppliers/NewSupplier', {
-      //   'name': this.addSupplierForm.name,
-      //   'mobile': this.addSupplierForm.mobile,
-      //   'sign_start': this.addSupplierForm.sign_start,
-      //   'sign_end': this.addSupplierForm.sign_end,
-      //   'province': place[0],
-      //   'city': place[1]
-      // })
-      // if(ret.StatusCode !== 200)
-      //   this.$message.error('添加新供应商失败')
-      // else {
-      //   this.$message.success('添加供应商成功')
-      //   // 添加成功关闭对话窗口
-      //   // this.ChangeAddState(false)
-      //   // 清空addSupplierForm信息
-      //   this.InitSupplier()
+      // this.verifyCorrect = false //需要看一下不显示了但是是不是真的变成了false：不显示就是false
+
+      var ret = await this.$http.post('/Suppliers/NewSupplier', {
+        'name': this.addSupplierForm.name,
+        'mobile': this.addSupplierForm.mobile,
+        'sign_start': this.addSupplierForm.sign_start,
+        'sign_end': this.addSupplierForm.sign_end,
+        'province': province,
+        'city': city
+      })
+      ret = ret.data
+      // console.log(ret)
+      if(ret.StatusCode !== 200) {// !== 同时检测它们的类型是否不相同
+        this.verifyCorrect = ret.msg
+      }
+      else {
+        this.verifyCorrect = '添加供应商成功'
+        this.$message.success('添加供应商成功')
+        // 清空addSupplierForm信息
+        this.InitSupplier()
+        // 添加成功关闭对话窗口
+        this.ChangeAddState(false)
+
+        this.getPlaceData(province, city, 'add')
+      }
+      // 新增供货商 更新列表
+      this.supplierList.push({
+        'name': this.addSupplierForm.name,
+        'mobile': this.addSupplierForm.mobile,
+        'sign_start': this.addSupplierForm.sign_start,
+        'sign_end': this.addSupplierForm.sign_end,
+        'province': province,
+        'city': city,
+        'isEdit': false
+      })
+    },
+    async AllSupplier() {
+      var ret = await this.$http.get('/Suppliers/SuppliersInfo')
+      // this.supplierList = [
+      //   {
+      //     id: 101,
+      //     name: '我们做得很好',
+      //     mobile: '12345678',
+      //     area: '上海 普陀区 金沙江路 1518 弄',
+      //     sign_start: '2020-01-08',
+      //     sign_end: '2050-01-08',
+      //     isEdit: false
+      //   },{
+      //     id: 102,
+      //     name: '液氮供不完大公司',
+      //     mobile: '04511432',
+      //     area: '北京 朝阳区',
+      //     sign_start: '2019-12-12',
+      //     sign_end: '2077-01-01',
+      //     isEdit: false
+      //   }
+      // ]
+      // console.log(this.supplierList)
+      var listTemp = ret.data.suppliers
+      this.pageTotal = listTemp.length
+      var time
+      for (var i in listTemp) {
+        time = new Date(listTemp[i]['sign_start'])
+        listTemp[i]['sign_start'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+        time = new Date(listTemp[i]['sign_end'])
+        listTemp[i]['sign_end'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+        listTemp[i]['area'] = listTemp[i]['province'] + listTemp[i]['city']
+        listTemp[i]['isEdit'] = false
+      }
+      this.supplierList = listTemp
+      // this.supplierList = ret.data.suppliers
+      // this.pageTotal = this.supplierList.length
+      // var time
+      // for (var i in this.supplierList) {
+      //   time = new Date(this.supplierList[i]['sign_start'])
+      //   this.supplierList[i]['sign_start'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+      //   time = new Date(this.supplierList[i]['sign_end'])
+      //   this.supplierList[i]['sign_end'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+      //   this.supplierList[i]['area'] = this.supplierList[i]['province'] + this.supplierList[i]['city']
+      //   this.supplierList[i]['isEdit'] = false
       // }
-    }
+      // console.log(this.supplierList)
+    },
+    async ScreenSupplier() {// 根据输入的条件筛选供应商
+      // var ret = await this.$http.get('/Suppliers/GetSuppliers', {
+      //   params: {
+      //     condition: this.inputCondition
+      //   }
+      // })
+      // this.supplierList = ret.supplier
+      // console.log(this.supplierList)
+    },
+    async SaveChange(row) {// line-110
+      // console.log(typeof(row.area),row.area)
+      var province = null
+      var city = null
+      if(typeof(row.area) != "string") {// 重新设定地址object
+        province = row.area[0]
+        city = row.area[1]
+        row.area = province + city
+      }
+      this.ShowEditDialog(row)
+      // 保存修改上传
+      console.log('改',row.id)
+      const ret = await this.$confirm('此操作将修改该供货商信息, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => {
+        return err
+      })
+
+      if (ret !== 'confirm') {
+        return this.$message.info('取消修改')
+        this.CancleEdit(row)
+      }
+      else {
+        const { data: mess } = await this.$http.post('Suppliers/ModifySupplier',{
+          params: {
+            id: row.id,
+            name: row.name,
+            mobile: row.mobile,
+            province: province,
+            city: city,
+            sign_start: row.sign_start,
+            sign_end: row.sign_end
+          }
+        })
+        if (mess.StatusCode !== 200) return this.$message.error(mess.msg)
+        else {
+          if(this.DeteleSupplierFromList(id)) this.$message.success('修改供货商信息成功')
+        }
+      }
+    },
+    CancleEdit(row) {
+      console.log(row.id)
+      // 取消不修改供应商信息
+      this.ShowEditDialog(row)
+      // ****************************************************筛选的话 id怎么排?
+      // for (var i in this.supplierList) {
+      //   console.log(this.supplierList[i]['id'], this.supplierList[i]['id'] == row.id)
+      //   if(this.supplierList[i]['id'] == row.id){
+      //     row.name = this.supplierList[i].name
+      //     row.mobile = this.supplierList[i].mobile
+      //     row.area = this.supplierList[i].area //province city
+      //     row.sign_start = this.supplierList[i].sign_start
+      //     row.sign_end = this.supplierList[i].sign_end
+      //     break
+      //   }
+      // }
+    },
+    ShowEditDialog(row) {
+      console.log('Show',row.id)
+      // alert(row.isEdit)
+      // this.initUpdateVal = row.id
+      row.isEdit = !row.isEdit
+      
+      // console.log()
+      // alert(row.isEdit)
+    },
+    DeteleSupplierFromList(id) {
+      for (var i in this.supplierList) {
+        if(this.supplierList[i]['id'] == id){
+          this.getPlaceData(this.supplierList[i]['province'], this.supplierList[i]['city'], 'delete') // 还需判断0
+          this.supplierList.splice(i,1);
+          return true
+        }
+      }
+      alert('根据id没能找到该供货商')
+      return false
+    },
+    async DeleteSupplier(id) {
+      // console.log(id)
+      // this.DeteleSupplierFromList(id)
+
+      const ret = await this.$confirm('此操作将永久删除该供货商, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => {
+        return err
+      })
+
+      if (ret !== 'confirm') return this.$message.info('取消删除')
+      else {
+        const { data: mess } = await this.$http.get('Suppliers/DeleteSupplier',{
+          params: {
+            id: id
+          }
+        })
+        if (mess.StatusCode !== 200) return this.$message.error('删除供货商失败')
+        else {
+          if(this.DeteleSupplierFromList(id)) this.$message.success('删除供货商成功')
+        }
+      }
+    },
+    handleSizeChange(newSize) {
+      this.pageSize = newSize;
+    },
+    // 分页的页面变化
+    handleCurrentChange(newCurr){
+      this.pageNum = newCurr
+    },
+    // 下载供应商表
+    // table筛选
+    downExcel () {
+      this.downloadLoading = true
+      // import("../../vender/Export2Excel").then(excel => {
+      //   const tHeader = [
+      //     "姓名", "性别", "电话", "地区", "角色"
+      //   ]
+      //   const filterVal = [
+      //     "name", "gender", "mobile", "area", "role_id"
+      //   ]
+      //   const data = this.formatJson(filterVal)
+      //   excel.export_json_to_excel({
+      //     header: tHeader,
+      //     data,
+      //     filename: "员工信息表"
+      //   })
+        this.downloadLoading = false
+      // })
+    },
+    // formatJson(filterVal) {
+    //   return this.supplierList.map(v =>
+    //     filterVal.map(j => v[j])
+    //   )
+    // },
   }
 }
 </script>

@@ -22,18 +22,18 @@
             <el-row :class="['bdbottom', i1===0 ? 'bdtop': '', 'vcenter']" v-for="(item1, i1) in scope.row.children" :key="item1.id">
               <!--渲染一级商品分类-->
               <el-col :span="5">
-                <el-tag>{{item1.name}}</el-tag>
+                <el-tag :closable="item1.children.length == 0 ? true: false" @close="deleteCat(item1.id)">{{item1.name}}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
                 <!--渲染二级商品分类-->
                 <el-row :class="[i2 === 0 ? '' : 'bdtop', 'vcenter']" v-for="(item2, i2) in item1.children" :key="item2.id">
                   <el-col :span="6">
-                    <el-tag type="success">{{item2.name}}</el-tag>
+                    <el-tag type="success" :closable="item2.children.length == 0 ? true: false" @close="deleteCat(item2.id)">{{item2.name}}</el-tag>
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <el-col :span="18">
-                    <el-tag @click="jumpToInfo(item3.id)" type="warning" v-for="(item3, i3) in item2.children" :key="i3.id">
+                    <el-tag @click="jumpToInfo(item3.id)" type="warning" v-for="(item3, i3) in item2.children" :key="item3.id" closable @close="deleteGood(item3.id)">
                       {{item3.name}}</el-tag>
                   </el-col>
                 </el-row>
@@ -45,7 +45,7 @@
         <el-table-column label="下含分类" prop="children.length"></el-table-column>
         <el-table-column label="操作">
           <template slot-scope="scope">
-            <el-button type="warning" icon="el-icon-setting" size="mini">还没想好</el-button>
+            <el-button type="warning" icon="el-icon-setting" size="mini" @click="openSaleDialog(scope.row.id)">销售情况</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -74,6 +74,14 @@
           <el-button type="primary" @click="AddCate">确定</el-button>
       </span>
     </el-dialog>
+    <!--展示销售情况的对话框-->
+    <el-dialog title="销售情况" :visible.sync="saleSee" width="50%" @open="openImg" @close="closeImg">
+      <div id="newEcharts" style="width:500px;height:400px;padding-top:40px"></div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="saleSee = false">取 消</el-button>
+        <el-button type="primary" @click="saleSee = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -84,6 +92,11 @@ export default {
       goodList: [],
       totalNum: 0,
       addCateSee: false,
+      saleSee: false,
+      saleSeeid: 0,
+      dataset: {source:[
+          ['product', '2012', '2013', '2014', '2015'],
+        ]},
       tempForm: { // 提交增加分类表单前的预操作
         choseValue: [],
         domains: [{ value: '', key:  1}],
@@ -179,7 +192,109 @@ export default {
     // 添加商品，跳转至添加商品页面
     addGood(){
       this.$router.push('/addgood')
+    },
+    // 删除没有子分类的类别
+    async deleteCat(id){
+      // console.log(id)
+      const {data: res} = await this.$http.get('Goods/DeleteCat', {
+        params: {catId: id}
+      })
+      if(res.StatusCode !== 200)
+        return this.$message.error('删除分类失败')
+      else{
+        this.$message.success('删除分类成功')
+        this.call(this.goodList, id)
+        // this.getGoodsList()
+      }
+    },
+    // 删除商品
+    async deleteGood(id){
+      const {data: res} = await this.$http.get('Goods/DeleteGood', {
+        params: {good_id: id}
+      })
+      if(res.StatusCode !== 200)
+        return this.$message.error('删除商品失败')
+      else{
+        this.$message.success('删除商品成功')
+        this.call(this.goodList, id)
+      }
+    },
+    // 递归删除children
+    call(arr, tag){
+      for(var i = arr.length; i>0; i--){
+        if(arr[i-1].id == tag) {
+          arr.splice(i - 1, 1)
+        }
+        else{
+          if(arr[i-1].children){
+            this.call(arr[i-1].children, tag)
+          }
+        }
+      }
+    },
+    // 打开图片，得到展示的id值
+    openSaleDialog(id) {
+      this.saleSeeid = id
+      this.saleSee = true
+    },
+    // 打开图片
+    async openImg(){
+      console.log(this.saleSeeid)
+      const {data: res} = await this.$http.get('/Statistic/NextCatsProfits?catId=' + this.saleSeeid)
+      if(res.StatusCode !== 200)
+        return this.$message.error('获取销售数据失败')
+      else{
+        for(let i=0; i<res.data.length; i++){
+          let temp = []
+          temp.push(res.data[i].name, res.data[i].day_profit, res.data[i].month_profit, res.data[i].year_profit)
+          this.dataset.source.push(temp)
+        }
+        console.log(this.dataset)
+      }
+      this.$nextTick(() => {
+        //  执行echarts方法
+        this.initEcharts()
+      })
+    },
+    initEcharts() {
+      const myChart = this.$echarts.init(document.getElementById('newEcharts'))
+      var option = {
+        legend: {},
+        tooltip: {},
+        dataset: this.dataset,
+        series: [{
+          name: "日利润",
+          type: 'pie',
+          radius: 60,
+          center: ['45%', '30%']
+        }, {
+          name: "月利润",
+          type: 'pie',
+          radius: 60,
+          center: ['25%', '75%'],
+          encode: {
+            itemName: 'product',
+            value: '2013'
+          }
+        }, {
+            name: "年利润",
+            type: 'pie',
+            radius: 60,
+            center: ['75%', '75%'],
+            encode: {
+              itemName: 'product',
+              value: '2014'
+            }
+        }]
+      }
+      myChart.setOption(option)
+    },
+    closeImg() {
+      this.dataset =  {source:[
+        ['product', '2012', '2013', '2014', '2015'],
+      ]}
     }
+
   }
 }
 </script>

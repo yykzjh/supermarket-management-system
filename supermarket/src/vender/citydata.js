@@ -66,8 +66,8 @@ export default [
         label: '延庆区'
       }
     ],
-    value: '北京市',
-    label: '北京市'
+    value: '北京',
+    label: '北京'
   },
   {
     children: [
@@ -136,8 +136,8 @@ export default [
         label: '蓟州区'
       }
     ],
-    value: '天津市',
-    label: '天津市'
+    value: '天津',
+    label: '天津'
   },
   {
     children: [
@@ -1922,8 +1922,8 @@ export default [
         label: '阿拉善盟'
       }
     ],
-    value: '内蒙古自治区',
-    label: '内蒙古自治区'
+    value: '内蒙古',
+    label: '内蒙古'
   },
   {
     children: [
@@ -3378,8 +3378,8 @@ export default [
         label: '崇明区'
       }
     ],
-    value: '上海市',
-    label: '上海市'
+    value: '上海',
+    label: '上海'
   },
   {
     children: [
@@ -9284,8 +9284,8 @@ export default [
         label: '崇左市'
       }
     ],
-    value: '广西壮族自治区',
-    label: '广西壮族自治区'
+    value: '广西',
+    label: '广西'
   },
   {
     children: [
@@ -11798,8 +11798,8 @@ export default [
         label: '阿里地区'
       }
     ],
-    value: '西藏自治区',
-    label: '西藏自治区'
+    value: '西藏',
+    label: '西藏'
   },
   {
     children: [
@@ -13074,8 +13074,8 @@ export default [
         label: '中卫市'
       }
     ],
-    value: '宁夏回族自治区',
-    label: '宁夏回族自治区'
+    value: '宁夏',
+    label: '宁夏'
   },
   {
     children: [
@@ -13568,19 +13568,19 @@ export default [
         label: '铁门关市'
       }
     ],
-    value: '新疆维吾尔自治区',
-    label: '新疆维吾尔自治区'
+    value: '新疆',
+    label: '新疆'
   },
   {
     value: '台湾',
     label: '台湾'
   },
   {
-    value: '香港特别行政区',
-    label: '香港特别行政区'
+    value: '香港',
+    label: '香港'
   },
   {
-    value: '澳门特别行政区',
-    label: '澳门特别行政区'
+    value: '澳门',
+    label: '澳门'
   }
 ]
