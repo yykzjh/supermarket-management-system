@@ -189,3 +189,7 @@ def theCatFixProfit(catId):
     return dict(id=theCat.id, name=theCat.name, parent=theCat.parent, level=theCat.level, 
                 day_profit=day_profit, month_profit=month_profit, year_profit=year_profit)
 
+
+def goodIdToName(good_id):
+    return Good.query.get(good_id).name
+

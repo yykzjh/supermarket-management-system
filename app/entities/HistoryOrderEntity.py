@@ -69,3 +69,13 @@ def selectPriceList(start_time, end_time, good_id):
     for order in orders:
         priceList.append(dict(datetime=order.datetime, price=order.price))
     return priceList
+
+
+def goodSaleAmountInPeriod(good_id, start_time, end_time):
+    orders = Order.query.filter(and_(Order.good_id==good_id,
+        Order.datetime>=start_time, Order.datetime<end_time)).all()
+    
+    sum = 0.0
+    for order in orders:
+        sum += order.amount
+    return sum

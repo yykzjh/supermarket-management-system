@@ -5,7 +5,7 @@ Description: 进货记录的方法接口
 '''
 
 from sqlalchemy import (or_, func, and_)
-from app.models import db, Purchase, to_json
+from app.models import db, Purchase, to_json, Good
 
 
 '''
@@ -62,4 +62,15 @@ def selectPriceList(start_time, end_time, good_id):
     for order in orders:
         priceList.append(dict(finish_time=order.finishtime, price_in=order.price_in))
     return priceList
+
+
+def goodPurchaseAmountInPeriod(good_id, start_time, end_time):
+    orders = Purchase.query.filter(and_(Purchase.good_id==good_id, Purchase.if_finish==True,
+        Purchase.finishtime>=start_time, Purchase.finishtime<end_time)).all()
     
+    sum = 0.0
+    for order in orders:
+        sum += order.amount
+    return sum
+
+

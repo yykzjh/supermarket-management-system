@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app.entities.GoodEntity import searchGoodsId
-from app.entities.HistoryOrderEntity import (revenueInPeriod, selectOrders, deleteOrder, selectPriceList)
+from app.entities.GoodEntity import searchGoodsId, goodIdToName
+from app.entities.HistoryOrderEntity import (revenueInPeriod, selectOrders, deleteOrder, selectPriceList,
+    goodSaleAmountInPeriod)
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -131,3 +132,28 @@ def goodSalePriceInPeriod():
 
     priceList = selectPriceList(start_time, end_time, good_id)
     return jsonify(priceList=priceList)
+
+
+'''
+description: 返回一定时间内指定分类下所有商品的销量
+author: yykzjh
+Date: 2021-01-09 17:44:57
+param {分类id:int} catId
+param {起始时间:datetime} start_time
+param {终止时间:datetime} end_time
+return {saleAmountList:[dict]} dict:{name, value}
+'''
+@app_history_orders.route("/GoodsSaleAmountInPeriod", methods=["POST"])
+def goodsSaleAmountInPeriod():
+    info = request.get_json()
+    catId = info.get('catId')
+    start_time = info.get('start_time')
+    end_time = info.get('end_time')
+    goodsId = searchGoodsId(catId)
+
+    saleAmountList = []
+    for goodId in goodsId:
+        saleAmountInPeriod.append(dict(name=goodIdToName(goodId), 
+            value=goodSaleAmountInPeriod(goodId, start_time, end_time)))
+    
+    return jsonify(saleAmountList=saleAmountList)
