@@ -45,7 +45,8 @@ export default {
   data() {
     return {
       ordersList: [],
-      rowUnit: [],
+      rowUnit: [],//2 1 1 1
+      testID: [0,-1,1,2,3],
       tableIndex: 0, // table的下标
       UnitIndex: 0, // rowUnit的下标
       scollPrice: [],
@@ -142,6 +143,7 @@ export default {
           let tempName = res.orders[key].good_name.split("  ")
           let tempPrice = res.orders[key].price.split("  ")
           that.rowUnit.push(tempAmount.length)
+          // console.log(that.rowUnit)
 
           let totalMoney = 0
 
@@ -164,17 +166,17 @@ export default {
     },
     spanMethod({ row, column, rowIndex, columnIndex }){
       if(columnIndex === 0){
-        if(rowIndex === 0){
-          return {
-            rowspan: 2,
-            colspan: 1
-          };
-        }else {
-          return {
-            rowspan: 1,
-            colspan: 1
+        if (this.testID[rowIndex] >=  0) {
+            return {
+              rowspan: this.rowUnit[this.testID[rowIndex]],
+              colspan: 1
+            };
+          } else {
+            return {
+              rowspan: 0,
+              colspan: 0
+            }
           }
-        }
       }
     },
     change() {

@@ -37,7 +37,7 @@
             type="refresh"
             icon="el-icon-refresh"
             circle
-            @click="UpdataLineChart"
+            @click="RefreshTime"
             style="margin-left: 5px">
           </el-button>
         </span>
@@ -82,7 +82,7 @@
             }
           }]
         },
-        pickerTime: '',
+        pickerTime: null,
 
         // pie图表数据
         pieInstance: null,
@@ -101,27 +101,27 @@
         priceMin: 0,
         priceMax: 1,// 价格最大值
         priceIn: [
-    [ '2017-03-01',1 ],
-    [ '2017-06-01', 0.5 ],
-    [ '2017-07-02', 0.5 ],
-    [ '2017-12-01',1 ],
-    [ '2018-01-01', 0.5 ],
-    [ '2018-02-02', 0.5 ],
-    [ '2018-03-01',1 ],
-    [ '2018-06-01', 0.5 ],
-    [ '2018-07-02', 0.5 ],
-],// 进价变化数组
+          [ '2017-03-01',1 ],
+          [ '2017-06-01', 0.5 ],
+          [ '2017-07-02', 0.5 ],
+          [ '2017-12-01',1 ],
+          [ '2018-01-01', 0.5 ],
+          [ '2018-02-02', 0.5 ],
+          [ '2018-03-01',1 ],
+          [ '2018-06-01', 0.5 ],
+          [ '2018-07-02', 0.5 ],
+        ],// 进价变化数组
         priceOut: [
-    [ '2017-03-01',1 ],
-    [ '2017-06-01', 0.5 ],
-    [ '2017-07-02', 0.5 ],
-    [ '2017-12-01',1 ],
-    [ '2018-01-01', 0.5 ],
-    [ '2018-02-02', 0.5 ],
-    [ '2018-03-01',1 ],
-    [ '2018-06-01', 0.5 ],
-    [ '2018-07-02', 0.5 ],
-],// 售价变化数组
+          [ '2017-03-01',1 ],
+          [ '2017-06-01', 0.5 ],
+          [ '2017-07-02', 0.5 ],
+          [ '2017-12-01',1 ],
+          [ '2018-01-01', 0.5 ],
+          [ '2018-02-02', 0.5 ],
+          [ '2018-03-01',1 ],
+          [ '2018-06-01', 0.5 ],
+          [ '2018-07-02', 0.5 ],
+        ],// 售价变化数组
       }
     },
     created () {
@@ -131,6 +131,7 @@
     mounted() {
       document.getElementById('spanTitle').innerText = this.goodid
       this.GetPieData()
+      // this.GetLineData()
       this.InitCharts()
       window.addEventListener('resize', this.screenAdapter)
       this.screenAdapter()// 初始效果
@@ -138,10 +139,14 @@
     methods: {
       RefreshTime() {
         // console.log(this.pickerTime)
-        this.startTime=this.pickerTime[0]
-        this.endTime=this.pickerTime[1]
+        if(this.pickerTime != null) {
+          // console.log(this.pickerTime)
+          this.startTime=this.pickerTime[0]
+          this.endTime=this.pickerTime[1]
+        }
         // this.GenerateTimeaxis()
-        
+        else this.startTime = ''
+        this.GetLineData()
       },
       InitCharts() {
         this.Pie()
@@ -204,7 +209,7 @@
         this.pieInstance.setOption(initOption)
       },
       Line() {
-        this.GetLineData()
+        // this.GetLineData() //先默认查3个月吧
         this.lineInstance = this.$echarts.init(this.$refs.line_ref)
 
         // var regressionIn = ecStat.regression('polynomial', this.priceIn, 3);
@@ -401,59 +406,131 @@
         (time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+
         (time.getDate()<10?'0'+time.getDate():time.getDate())
       },
-      GetLineData() {
-        if(this.startTime == '') {
+      TimeFormat(time) {
+        var date_ = new Date(time)
+        var year = date_.getFullYear()
+        var month = date_.getMonth()+1
+        var day = date_.getDate()
+        if(month<10) month = "0"+month
+        if(day<10) day = "0"+day
+
+        var hours = date_.getHours()
+        var mins = date_.getMinutes()
+        var secs = date_.getSeconds()
+        var msecs = date_.getMilliseconds()
+        if(hours<10) hours = "0"+hours
+        if(mins<10) mins = "0"+mins
+        if(secs<10) secs = "0"+secs
+        if(msecs<10) secs = "0"+msecs
+        // console.log(year+"/"+month+"/"+day+" "+hours+":"+mins+":"+secs)
+        return  year+"/"+month+"/"+day+" "+hours+":"+mins+":"+secs
+      },
+      async GetLineData() {
+        if(this.startTime == '') {// 默认查三个月的
           const end = new Date();
           const start = new Date();
           start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
           this.startTime = this.DateFromat(start)
           this.endTime = this.DateFromat(end)
-          console.log(this.endTime, this.startTime)
+          console.log(this.endTime, this.startTime)// 其实我也可以发送给你精确到秒的
         }
-        this.GenerateTimeaxis()
+        // this.GenerateTimeaxis()
         // priceIn 进价变化数组
         // priceOut 售价变化数组
-        var i = 0
-        const len = this.timeData.length
-
-        // 销量数组
-      },
-      async GetPieData() { 
-        console.log(typeof(this.goodid),typeof(parseInt(this.goodid)))
-        var ret = await this.$http.get('/Stocks/amountOfTheCat',{
-          'catId': parseInt(this.goodid)
-        })
-        if(ret.status !== 200)
-          this.$message.error('Network 获取商品库存失败')
-        else {
-          console.log(ret)
-          // this.pieData[0] = {}
-
-          ret = await this.$http.get('/OnSales/amountOfTheCat',{
-            'catId': parseInt(this.goodid)
-          })
-          if(ret.status !== 200)
-            this.$message.error('Network 获取商品上架数量失败')
-          else {
-            console.log(ret)
-            // this.pieData[1] = {}
-            this.UpdataPieChart()
-          }
-        }
-      },
-      async UpdataLineChart() {// refresh button
-        this.RefreshTime()
-        var ret = await this.$http.post('/PurchaseOrders/GoodPurchasePriceInPeriod',{
+        var temp = null
+        var len = null
+        var ret = await this.$http.post('/PurchaseOrders/GoodPurchasePriceInPeriod', {
           'good_id': this.goodid,
           'start_time': this.startTime,
-          'end_time': this.endTime
+          'end_time': this.endTime,
         })
         if(ret.status !== 200)
           this.$message.error('Network 获取进价变化失败')
         else {
-          
-          console.log(ret)
+          // console.log(ret.data.priceList)
+          temp = ret.data.priceList
+          len = temp.length
+          this.priceIn = []
+          if(len!=0) {
+            this.priceMin = temp[0].price_in
+            this.priceMax = temp[0].price_in
+          }
+          for(var i in temp) {
+            // console.log()
+            this.priceIn.push([this.TimeFormat(temp[i].finish_time),temp[i].price_in])
+            if(temp[i].price_in > this.priceMax) this.priceMax = temp[i].price_in
+            if(temp[i].price_in < this.priceMin) this.priceMin = temp[i].price_in
+          }
+
+          ret = await this.$http.post('/HistoryOrders/GoodSalePriceInPeriod', {
+            'good_id': this.goodid,
+            'start_time': this.startTime,
+            'end_time': this.endTime,
+          })
+          if(ret.status !== 200)
+            this.$message.error('Network 获取售价变化失败')
+          else {
+            
+            if(len==0 && temp.length!=0) {
+              this.priceMin = temp[0].price_in
+              this.priceMax = temp[0].price_in
+            }
+            temp = ret.data.priceList
+
+            // console.log(temp)
+            this.priceOut = []
+            for(var i in temp) {
+              this.priceOut.push([this.TimeFormat(temp[i].datetime),temp[i].price])
+              if(temp[i].price > this.priceMax) this.priceMax = temp[i].price
+              if(temp[i].price < this.priceMin) this.priceMin = temp[i].price
+            }
+            // console.log("what",this.priceOut)
+            this.priceMax = this.priceMax + this.priceMax / 100.0
+            this.priceMin = this.priceMin - this.priceMin / 100.0
+            // console.log(this.priceIn,this.priceOut)
+            this.UpdataLineChart()// 一个点显示小时，多个显示天
+          }
         }
+        // 销量数组
+      },
+      async GetPieData() { 
+        var ret  = await this.$http.get('/Stocks/amountOfTheCat?catId=' + this.goodid)
+        // var ret = await this.$http.get('/Stocks/amountOfTheCat', {
+        //   params: {catId: this.goodid}})
+        if(ret.status !== 200)
+          this.$message.error('Network 获取商品库存失败')
+        else {
+          ret = ret.data
+          // {value: 335, name: '库存'}
+          this.pieData[0] = {value: ret.amount, name: '库存'}
+          // console.log(this.pieData[0])
+          ret = await this.$http.get('/OnSales/amountOfTheCat?catId=' + this.goodid)
+          if(ret.status !== 200)
+            this.$message.error('Network 获取商品上架数量失败')
+          else {
+            ret = ret.data
+            // console.log(ret)
+            this.pieData[1] = {value: ret.amount, name: '已上架'}
+            this.UpdataPieChart()
+          }
+        }
+      },
+      UpdataLineChart() {// refresh button
+        const newOptions ={
+          series: [
+            {
+              data: this.priceOut
+            },
+            {
+              data: this.priceIn
+            }
+          ],
+          visualMap: {
+            min: this.priceMin,
+            max: this.priceMax,
+          }
+        }
+        this.lineInstance.setOption(newOptions)
       },
       UpdataPieChart() {
         const newOptions = {
