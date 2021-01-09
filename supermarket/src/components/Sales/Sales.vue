@@ -12,26 +12,49 @@
         </el-card>
       </el-col>
       <el-col :span="12" style="margin-left: 15px">
-        <el-card class="grid-content"></el-card>
+        <el-card class="grid-content">
+          <el-table
+            border height="400px" :data="scollPrice">
+            <el-table-column prop="time" label="订单生成时间"></el-table-column>
+            <el-table-column prop="total" label="订单总额"></el-table-column>
+          </el-table>
+        </el-card>
       </el-col>
     </el-row>
 
 
     <el-card style="margin-top: 15px">
-      <h1>放订单表格</h1>
+      <el-table :data="ordersList" :span-method="spanMethod" border stripe style="width: 100%">
+        <el-table-column prop="datetime" label="时间"></el-table-column>
+        <el-table-column prop="good_name" label="名称"></el-table-column>
+        <el-table-column prop="price" label="价格"></el-table-column>
+        <el-table-column prop="amount" label="数量"></el-table-column>
+      </el-table>
     </el-card>
   </div>
 
 </template>
 
 <script>
+  import elTableInfiniteScroll from 'el-table-infinite-scroll';
+
 export default {
+  directives: { // 局部引入无限循环滚动条
+    'el-table-infinite-scroll': elTableInfiniteScroll
+  },
   data() {
     return {
-
+      ordersList: [],
+      rowUnit: [],
+      tableIndex: 0, // table的下标
+      UnitIndex: 0, // rowUnit的下标
+      scollPrice: [],
+      timer: null,
     }
   },
   created () {
+    this.getOrdersList()
+    this.play()
   },
   mounted () {
     this.createImg()
@@ -107,6 +130,60 @@ export default {
         myChart.setOption(option);
       });
     },
+    async getOrdersList() {
+      const {data: res} = await this.$http.get('/HistoryOrders/AllHistoryOrders')
+      if(res === {})
+        return this.$message.error('获取订单信息失败')
+      else{
+        let that = this
+        Object.keys(res.orders).forEach(function(key){
+          // console.log(key,res.orders[key]);
+          let tempAmount = res.orders[key].amount.split("  ")
+          let tempName = res.orders[key].good_name.split("  ")
+          let tempPrice = res.orders[key].price.split("  ")
+          that.rowUnit.push(tempAmount.length)
+
+          let totalMoney = 0
+
+          for(let i=0; i<tempAmount.length; i++){
+            let tempObj = { amount: 0, datetime: '', good_name: '', price: 0 }
+            tempObj.amount = parseFloat(tempAmount[i])
+            tempObj.good_name = tempName[i]
+            tempObj.price = parseFloat(tempPrice[i])
+            totalMoney += tempObj.amount * tempObj.price
+            tempObj.datetime = res.orders[key].datetime.split(" ")[0]
+            that.ordersList.push(tempObj)
+          }
+          let tempObj2 = {time: res.orders[key].datetime.split(" ")[0], total: totalMoney}
+          that.scollPrice.push(tempObj2)
+        });
+        // console.log(that.ordersList)
+        // console.log(that.scollPrice)
+        // console.log(that.rowUnit)
+      }
+    },
+    spanMethod({ row, column, rowIndex, columnIndex }){
+      if(columnIndex === 0){
+        if(rowIndex === 0){
+          return {
+            rowspan: 2,
+            colspan: 1
+          };
+        }else {
+          return {
+            rowspan: 1,
+            colspan: 1
+          }
+        }
+      }
+    },
+    change() {
+      this.scollPrice.push(this.scollPrice[0]);//把第一条数据插入数组最有一条
+      this.scollPrice.shift();//删除数组中第一条数据
+    },
+    play() {
+      // setInterval(this.change, 2000);//每两秒执行一次插入删除操作
+    }
   },
 
 }
