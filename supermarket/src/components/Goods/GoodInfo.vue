@@ -130,6 +130,7 @@
     },
     mounted() {
       document.getElementById('spanTitle').innerText = this.goodid
+      this.GetPieData()
       this.InitCharts()
       window.addEventListener('resize', this.screenAdapter)
       this.screenAdapter()// 初始效果
@@ -147,7 +148,6 @@
         this.Line()
       },
       Pie() {
-        this.GetPieData()
         this.pieInstance = this.$echarts.init(this.$refs.pie_ref)
         const initOption = {
           tooltip: {
@@ -418,12 +418,52 @@
 
         // 销量数组
       },
-      GetPieData() {
+      async GetPieData() { 
+        console.log(typeof(this.goodid),typeof(parseInt(this.goodid)))
+        var ret = await this.$http.get('/Stocks/amountOfTheCat',{
+          'catId': parseInt(this.goodid)
+        })
+        if(ret.status !== 200)
+          this.$message.error('Network 获取商品库存失败')
+        else {
+          console.log(ret)
+          // this.pieData[0] = {}
 
+          ret = await this.$http.get('/OnSales/amountOfTheCat',{
+            'catId': parseInt(this.goodid)
+          })
+          if(ret.status !== 200)
+            this.$message.error('Network 获取商品上架数量失败')
+          else {
+            console.log(ret)
+            // this.pieData[1] = {}
+            this.UpdataPieChart()
+          }
+        }
       },
-      UpdataLineChart() {
+      async UpdataLineChart() {// refresh button
         this.RefreshTime()
-
+        var ret = await this.$http.post('/PurchaseOrders/GoodPurchasePriceInPeriod',{
+          'good_id': this.goodid,
+          'start_time': this.startTime,
+          'end_time': this.endTime
+        })
+        if(ret.status !== 200)
+          this.$message.error('Network 获取进价变化失败')
+        else {
+          
+          console.log(ret)
+        }
+      },
+      UpdataPieChart() {
+        const newOptions = {
+          series: [
+            {
+              data: this.pieData
+            }
+          ]
+        }
+        this.pieInstance.setOption(newOptions)
       },
       screenAdapter() {
         this.pieInstance.resize()
