@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.entities.GoodEntity import searchGoodsId
-from app.entities.HistoryOrderEntity import revenueInPeriod, selectOrders, deleteOrder
+from app.entities.HistoryOrderEntity import (revenueInPeriod, selectOrders, deleteOrder, selectPriceList)
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -111,3 +111,23 @@ def deleteHistoryOrder():
         return jsonify(StatusCode=200)
     else:
         return jsonify(StatusCode=400, msg="没有该订单！")
+
+
+'''
+description: 返回某件商品一段时间内的售价变化数组
+author: yykzjh
+Date: 2021-01-09 17:19:27
+param {商品id:int} good_id
+param {起始时间:datetime} start_time
+param {终止时间:datetime} end_time
+return {priceList:[dict]} dict:{datetime, price}
+'''
+@app_history_orders.route("/GoodSalePriceInPeriod", methods=["POST"])
+def goodSalePriceInPeriod():
+    info = request.get_json()
+    good_id = info.get('good_id')
+    start_time = info.get('start_time')
+    end_time = info.get('end_time')
+
+    priceList = selectPriceList(start_time, end_time, good_id)
+    return jsonify(priceList=priceList)

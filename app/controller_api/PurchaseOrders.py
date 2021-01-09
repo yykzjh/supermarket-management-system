@@ -148,7 +148,7 @@ def catPurchaseOrders():
 
 
 '''
-description: 返回某件商品一段时间内的价格变化数组
+description: 返回某件商品一段时间内的进价变化数组
 author: yykzjh
 Date: 2021-01-09 17:19:27
 param {商品id:int} good_id

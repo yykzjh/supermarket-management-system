@@ -59,3 +59,13 @@ def selectOrders():
     for order in orders:
         order['good_name'] = Category.query.get(order['good_id']).name
     return orders
+
+
+def selectPriceList(start_time, end_time, good_id):
+    orders = Order.query.filter(and_(Order.good_id==good_id,
+        Order.datetime>=start_time, Order.datetime<end_time)).all()
+    
+    priceList = []
+    for order in orders:
+        priceList.append(dict(datetime=order.datetime, price=order.price))
+    return priceList
