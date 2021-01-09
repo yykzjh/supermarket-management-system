@@ -12,7 +12,10 @@
     "core-js": "^3.6.5",
     "echarts": "^4.8.0",
     "el-table-infinite-scroll": "^1.0.10",
+<<<<<<< HEAD
     "echarts-stat": "^1.2.0",
+=======
+>>>>>>> ef30876c57a234966cc030f30838a23b02b0886a
     "element-ui": "^2.4.5",
     "jquery": "^3.5.1",
     "tracking": "^1.1.3",

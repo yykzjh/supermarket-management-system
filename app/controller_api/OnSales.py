@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from app.entities.OnSaleEntity import details, amountOfGoods
+from app.entities.GoodEntity import searchGoodsId
 
 
 app_on_sales = Blueprint("app_on_sales", __name__)
