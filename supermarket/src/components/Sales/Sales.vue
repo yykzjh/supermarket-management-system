@@ -36,12 +36,8 @@
 </template>
 
 <script>
-  import elTableInfiniteScroll from 'el-table-infinite-scroll';
-
 export default {
-  directives: { // 局部引入无限循环滚动条
-    'el-table-infinite-scroll': elTableInfiniteScroll
-  },
+
   data() {
     return {
       ordersList: [],
@@ -49,18 +45,19 @@ export default {
       tableIndex: 0, // table的下标
       UnitIndex: 0, // rowUnit的下标
       scollPrice: [],
-      timer: null,
+      dataset: { source: [
+        ]},
     }
   },
   created () {
+    this.getImgList()
     this.getOrdersList()
     this.play()
   },
-  mounted () {
-    this.createImg()
-  },
   methods: {
     createImg() {
+      let that = this
+      // console.log(this.dataset)
       const myChart = this.$echarts.init(document.getElementById('newEcharts'))
       setTimeout(function () {
         const option = {
@@ -69,15 +66,7 @@ export default {
             trigger: 'axis',//触发类型，'axis'为坐标系触发
             showContent: false//是否显示提示框浮层
           },
-          dataset: {
-            source: [
-              ['product', '2012', '2013', '2014', '2015', '2016', '2017'],
-              ['Matcha Latte', 41.1, 30.4, 65.1, 53.3, 83.8, 98.7],
-              ['Milk Tea', 86.5, 92.1, 85.7, 83.1, 73.4, 55.1],
-              ['Cheese Cocoa', 24.1, 67.2, 79.5, 86.4, 65.2, 82.5],
-              ['Walnut Brownie', 55.2, 67.1, 69.2, 72.4, 53.9, 39.1]
-            ]
-          },
+          dataset: that.dataset,
           xAxis: {type: 'category'},
           yAxis: {gridIndex: 0},//y轴所在的grid的索引
           grid: {top: '55%'},
@@ -162,11 +151,16 @@ export default {
         // console.log(that.rowUnit)
       }
     },
+    // 播放销售订单
+    play() {
+      setInterval(this.change, 2000);//每两秒执行一次插入删除操作
+    },
     spanMethod({ row, column, rowIndex, columnIndex }){
       if(columnIndex === 0){
-        if(rowIndex === 0){
+        if(rowIndex === this.tableIndex){ //每次相等table的游标都下移rowUnit单位
+          this.tableIndex += this.rowUnit[this.UnitIndex]
           return {
-            rowspan: 2,
+            rowspan: this.rowUnit[this.UnitIndex++], // 每次unit下标加一
             colspan: 1
           };
         }else {
@@ -181,9 +175,31 @@ export default {
       this.scollPrice.push(this.scollPrice[0]);//把第一条数据插入数组最有一条
       this.scollPrice.shift();//删除数组中第一条数据
     },
-    play() {
-      // setInterval(this.change, 2000);//每两秒执行一次插入删除操作
+    async getImgList() {
+      const {data: res} = await this.$http.get('/HistoryOrders/TopCatsSaleCount')
+      if(res === {})
+        this.$message.error('获取图表信息为空')
+      else {
+        let temp = []
+        temp[0] = 'sales'
+        for(let i=0; i<6; i++){
+          temp.push(parseInt(res.data[0].data[i].start_time.split('-')[1]).toString())
+        }
+        this.dataset.source.push(temp)
+        // console.log(this.dataset)
+
+        for(let i=0; i<res.data.length; i++){
+          temp = []
+          temp.push(res.data[i].name)
+          for(let j=0; j<6; j++){
+            temp.push(res.data[i].data[j].count)
+          }
+        this.dataset.source.push(temp)
+        }
+        this.createImg()
+      }
     }
+
   },
 
 }
