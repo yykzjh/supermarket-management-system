@@ -1,5 +1,14 @@
 <template>
-  <div>这是订货订单页面</div>
+  <div>
+    <el-breadcrumb separator="/">
+      <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+      <el-breadcrumb-item>订单管理</el-breadcrumb-item>
+      <el-breadcrumb-item>进货订单管理</el-breadcrumb-item>
+    </el-breadcrumb>
+    <el-card>
+
+    </el-card>
+  </div>
 </template>
 
 <script>
