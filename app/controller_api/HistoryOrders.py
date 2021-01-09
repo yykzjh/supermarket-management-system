@@ -168,12 +168,12 @@ return JSON {data:[dict]} dict:{catId, name, data:[dict2]} dict2:{start_time, en
 '''
 @app_history_orders.route("/TopCatsSaleCount", methods=["GET"])
 def topCatsSaleCount():
-    topCats = topCats()
+    Cats = topCats()
 
     data = []
     now_time = datetime.datetime.now()
     delta = relativedelta(months=+1)
-    for topCat in topCats:
+    for topCat in Cats:
         tmpDict = dict(catId=topCat['id'], name=topCat['name'], data=[])
         goods = searchGoodsId(topCat['id'])
         date_time = now_time

@@ -83,6 +83,6 @@ def goodSaleAmountInPeriod(good_id, start_time, end_time):
 
 def goodsCountInPeriod(goods, start_time, end_time):
     orders = Order.query.filter(and_(Order.good_id.in_(goods), \
-                    Order.datetime>=startTime, Order.datetime<endTime)).all()
+                    Order.datetime>=start_time, Order.datetime<end_time)).all()
     
     return len(orders)
