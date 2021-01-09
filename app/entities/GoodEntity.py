@@ -194,3 +194,8 @@ def theCatFixProfit(catId):
 def goodIdToName(good_id):
     return Good.query.get(good_id).name
 
+
+def topCats():
+    cats = to_json(Category.query.filter_by(parent=0).all())
+    return cats
+

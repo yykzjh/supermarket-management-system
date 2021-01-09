@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
-from app.entities.GoodEntity import searchGoodsId, goodIdToName
+from app.entities.GoodEntity import searchGoodsId, goodIdToName, topCats
 from app.entities.HistoryOrderEntity import (revenueInPeriod, selectOrders, deleteOrder, selectPriceList,
-    goodSaleAmountInPeriod)
+    goodSaleAmountInPeriod, goodsCountInPeriod)
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -157,3 +157,25 @@ def goodsSaleAmountInPeriod():
             value=goodSaleAmountInPeriod(goodId, start_time, end_time)))
     
     return jsonify(saleAmountList=saleAmountList)
+
+
+
+@app_history_orders.route("/TopCatsSaleCount", methods=["GET"])
+def topCatsSaleCount():
+    topCats = topCats()
+
+    data = []
+    now_time = datetime.datetime.now()
+    delta = relativedelta(months=+1)
+    for topCat in topCats:
+        tmpDict = dict(catId=topCat['id'], name=topCat['name'], data=[])
+        goods = searchGoodsId(topCat['id'])
+        date_time = now_time
+        for i in range(6):
+            tmpMonth = dict(start_time=date_time, end_time=date_time-delta, 
+                count=goodsCountInPeriod(goods, date_time-delta, date_time))
+            tmpDict['data'].append(tmpMonth)
+            date_time -= delta
+        data.append(tmpDict)
+    return jsonify(data=data)
+
