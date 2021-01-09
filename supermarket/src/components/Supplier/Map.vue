@@ -51,15 +51,66 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="电话" prop="mobile"></el-table-column>
-          <el-table-column label="地区" prop="area"></el-table-column>
-          <el-table-column label="合作起始日期" prop="sign_start"></el-table-column>
-          <el-table-column label="截止日期" prop="sign_end"></el-table-column>
+          <el-table-column label="电话" prop="mobile">
+            <template slot-scope="scope">
+              <el-input
+                v-show="scope.row.isEdit"
+                v-model="scope.row.mobile">
+              </el-input>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.mobile}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="地区" prop="area">
+            <template slot-scope="scope">
+              <el-cascader class="width"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.area"
+                :options="cityData"
+                :props="{ expandTrigger: 'hover',value:'value',label:'label',children:'children' }">
+              </el-cascader>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.area}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="合作起始日期" prop="sign_start">
+            <template slot-scope="scope">
+              <el-date-picker
+                value-format="yyyy-MM-dd"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.sign_start"
+                type="date"/>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.sign_start}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="截止日期" prop="sign_end">
+            <template slot-scope="scope">
+              <el-date-picker
+                value-format="yyyy-MM-dd"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.sign_end"
+                type="date"/>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.sign_end}}
+              </span>
+            </template>
+          </el-table-column>
           <!-- <el-table-column label="供应项目" prop="provide"></el-table-column> -->
           <el-table-column label="可执行操作">
             <template slot-scope="scope">
-              <el-button type="primary" icon="el-icon-edit" size="mini" @click="ShowEditDialog(scope.row)"></el-button>
-              <el-button type="danger" icon="el-icon-delete" size="mini" @click="DeleteSupplier(scope.row.id)"></el-button>
+              <el-button type="close" icon="el-icon-close" size="mini" @click="CancleEdit(scope.row)" v-show="scope.row.isEdit"></el-button>
+              <el-button type="success" icon="el-icon-check" size="mini" @click="SaveChange(scope.row)" v-show="scope.row.isEdit"></el-button>
+              <el-button type="primary" icon="el-icon-edit" size="mini" @click="ShowEditDialog(scope.row)" v-show="!scope.row.isEdit"></el-button>
+              <!-- <el-button disabled type="primary" icon="el-icon-edit" size="mini" @click="ShowEditDialog(scope.row)" v-show="!scope.row.isEdit"></el-button> -->
+              <el-button type="danger" icon="el-icon-delete" size="mini" @click="DeleteSupplier(scope.row.id)" v-show="!scope.row.isEdit"></el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -532,6 +583,16 @@ export default {
 
         this.getPlaceData(province, city, 'add')
       }
+      // 新增供货商 更新列表
+      this.supplierList.push({
+        'name': this.addSupplierForm.name,
+        'mobile': this.addSupplierForm.mobile,
+        'sign_start': this.addSupplierForm.sign_start,
+        'sign_end': this.addSupplierForm.sign_end,
+        'province': province,
+        'city': city,
+        'isEdit': false
+      })
     },
     async AllSupplier() {
       var ret = await this.$http.get('/Suppliers/SuppliersInfo')
@@ -542,26 +603,43 @@ export default {
       //     mobile: '12345678',
       //     area: '上海 普陀区 金沙江路 1518 弄',
       //     sign_start: '2020-01-08',
-      //     sign_end: '2050-01-08'
+      //     sign_end: '2050-01-08',
+      //     isEdit: false
       //   },{
       //     id: 102,
       //     name: '液氮供不完大公司',
       //     mobile: '04511432',
       //     area: '北京 朝阳区',
       //     sign_start: '2019-12-12',
-      //     sign_end: '2077-01-01'
+      //     sign_end: '2077-01-01',
+      //     isEdit: false
       //   }
       // ]
-      this.supplierList = ret.data.suppliers
-      this.pageTotal = this.supplierList.length
+      // console.log(this.supplierList)
+      var listTemp = ret.data.suppliers
+      this.pageTotal = listTemp.length
       var time
-      for (var i in this.supplierList) {
-        time = new Date(this.supplierList[i]['sign_start'])
-        this.supplierList[i]['sign_start'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
-        time = new Date(this.supplierList[i]['sign_end'])
-        this.supplierList[i]['sign_end'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
-        this.supplierList[i]['area'] = this.supplierList[i]['province'] + this.supplierList[i]['city']
+      for (var i in listTemp) {
+        time = new Date(listTemp[i]['sign_start'])
+        listTemp[i]['sign_start'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+        time = new Date(listTemp[i]['sign_end'])
+        listTemp[i]['sign_end'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+        listTemp[i]['area'] = listTemp[i]['province'] + listTemp[i]['city']
+        listTemp[i]['isEdit'] = false
       }
+      this.supplierList = listTemp
+      // this.supplierList = ret.data.suppliers
+      // this.pageTotal = this.supplierList.length
+      // var time
+      // for (var i in this.supplierList) {
+      //   time = new Date(this.supplierList[i]['sign_start'])
+      //   this.supplierList[i]['sign_start'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+      //   time = new Date(this.supplierList[i]['sign_end'])
+      //   this.supplierList[i]['sign_end'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+      //   this.supplierList[i]['area'] = this.supplierList[i]['province'] + this.supplierList[i]['city']
+      //   this.supplierList[i]['isEdit'] = false
+      // }
+      // console.log(this.supplierList)
     },
     async ScreenSupplier() {// 根据输入的条件筛选供应商
       // var ret = await this.$http.get('/Suppliers/GetSuppliers', {
@@ -572,11 +650,73 @@ export default {
       // this.supplierList = ret.supplier
       // console.log(this.supplierList)
     },
+    async SaveChange(row) {// line-110
+      // console.log(typeof(row.area),row.area)
+      var province = null
+      var city = null
+      if(typeof(row.area) != "string") {// 重新设定地址object
+        province = row.area[0]
+        city = row.area[1]
+        row.area = province + city
+      }
+      this.ShowEditDialog(row)
+      // 保存修改上传
+      console.log('改',row.id)
+      const ret = await this.$confirm('此操作将修改该供货商信息, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => {
+        return err
+      })
+
+      if (ret !== 'confirm') {
+        return this.$message.info('取消修改')
+        this.CancleEdit(row)
+      }
+      else {
+        const { data: mess } = await this.$http.post('Suppliers/ModifySupplier',{
+          params: {
+            id: row.id,
+            name: row.name,
+            mobile: row.mobile,
+            province: province,
+            city: city,
+            sign_start: row.sign_start,
+            sign_end: row.sign_end
+          }
+        })
+        if (mess.StatusCode !== 200) return this.$message.error(mess.msg)
+        else {
+          if(this.DeteleSupplierFromList(id)) this.$message.success('修改供货商信息成功')
+        }
+      }
+    },
+    CancleEdit(row) {
+      console.log(row.id)
+      // 取消不修改供应商信息
+      this.ShowEditDialog(row)
+      // ****************************************************筛选的话 id怎么排?
+      // for (var i in this.supplierList) {
+      //   console.log(this.supplierList[i]['id'], this.supplierList[i]['id'] == row.id)
+      //   if(this.supplierList[i]['id'] == row.id){
+      //     row.name = this.supplierList[i].name
+      //     row.mobile = this.supplierList[i].mobile
+      //     row.area = this.supplierList[i].area //province city
+      //     row.sign_start = this.supplierList[i].sign_start
+      //     row.sign_end = this.supplierList[i].sign_end
+      //     break
+      //   }
+      // }
+    },
     ShowEditDialog(row) {
+      console.log('Show',row.id)
+      // alert(row.isEdit)
+      // this.initUpdateVal = row.id
+      row.isEdit = !row.isEdit
       
-      this.initUpdateVal = row.id
-      row.isEdit = true
-      console.log(row.isEdit)
+      // console.log()
+      // alert(row.isEdit)
     },
     DeteleSupplierFromList(id) {
       for (var i in this.supplierList) {
