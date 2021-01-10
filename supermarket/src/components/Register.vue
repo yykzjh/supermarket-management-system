@@ -22,12 +22,15 @@
           <el-input v-model="repassword" prefix-icon="iconfont icon-3702mima" type="password" placeholder="请再次输入密码"></el-input>
         </el-form-item>
 
-        <el-form-item prop="face">
-          <el-button type="text">上传个人图片</el-button>
-          <el-upload   action="#" ref="upload" list-type="picture" :http-request="httpRequest">
-          <i class="el-icon-plus"></i>
-          </el-upload>
-        </el-form-item>
+        <div>
+          <div class="user-icon">
+            <video width="320" height="240" ref="videoDom" id="video" preload autoplay loop muted></video>
+            <canvas width="320" height="240" ref="canvasDOM"></canvas>
+          </div>
+
+          <div>{{loding}}</div>
+          <div class="button" @click="initTracker">人脸注册</div>
+        </div>
         <!--按钮区-->
         <el-form-item class="btns">
           <el-button type="warning" @click="registerUser">注册</el-button>
@@ -38,7 +41,10 @@
 </template>
 
 <script>
+  require('tracking/build/tracking-min.js')
+  require('tracking/build/data/face-min.js')
   export default {
+    name: 'testTracking',
     data () {
       return {
         // 登录表单的数据绑定对象
@@ -69,32 +75,137 @@
           face: [
             { required: true, message: '请输入登录密码', trigger: 'blur' },
           ]
-        }
+        },
+        count: 0,
+        isdetected: '请您保持脸部在画面中央',
+        loding: ''
       }
     },
     methods: {
-      httpRequest(data) {
-        let _this = this  // 这里要转一下是因为在下面的function里 this的指向发生了变化
-        let rd = new FileReader()
-        let file = data.file
-        rd.readAsDataURL(file)
-        rd.onloadend = function(e) {
-          _this.registerForm.face = this.result
-        }
-      },
       async registerUser() {
-        this.registerForm.face = this.registerForm.face.replace(/data:image\/.*;base64,/,'')
+        console.log(this.registerForm)
         if(this.registerForm.password !== this.repassword)
           this.$message.error('两次输入密码不一致，请重新输入')
         // console.log(this.registerForm)
         const {data : res} = await this.$http.post('/Users/Register', this.registerForm)
-        if(res.StatusCode !== 200) {
-          this.$message.error('注册失败')
-          console.log(res)
+        if(res.StatusCode === 200) {
+          this.$message.success('注册成功')
         }
-        else
-          this.$message.success('请求成功')
-      }
+        else{
+          this.$message.error(res.msg)
+        }
+
+      },
+      initTracker(){
+        // alert('进来了')
+        // alert(navigator.mediaDevices)
+        // 启用摄像头,这一个是原生调用摄像头的功能,不写的话有时候谷歌浏览器调用摄像头会失败
+        navigator.mediaDevices
+          .getUserMedia({video: true,audio: true})
+          .then(this.getMediaStreamSuccess)
+          .catch(this.getMediaStreamError)
+
+        this.context  = this.canvas.getContext('2d')
+
+        // 初始化tracking参数
+        this.tracker = new tracking.ObjectTracker("face");
+        this.tracker.setInitialScale(4);
+        this.tracker.setStepSize(2);
+        this.tracker.setEdgesDensity(0.1);
+        this.tracker.on("track", event => {
+          this.onTracked(event);
+        });
+
+        // tracking启用摄像头,这里我选择调用原生的摄像头
+        // tracking.track(this.video, this.tracker, { camera: true });
+
+        // 如果是读取视频，可以用trackerTask.stop trackerTask.run来暂停、开始视频
+        this.trackerTask = tracking.track(this.video, this.tracker);
+      },
+      // 监听中
+      onTracked(event){
+        // 判断终止条件, stop是异步的，不返回的话，还会一直截图
+        if (this.count >= 21) {
+          this.onStopTracking();
+          return;
+        }
+
+        // 画框框
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        event.data.forEach(rect => {
+          this.context.lineWidth = 1;
+          this.context.strokeStyle = "#a64ceb";
+          //'#a64ceb';
+          this.context.strokeRect(rect.x, rect.y, rect.width, rect.height);
+          this.context.font = "11px Helvetica";
+          this.context.fillStyle = "#fff";
+          // 截图
+
+          if (event.data.length > 0 && this.count <= 20) {
+            if (this.count < 0) {
+              this.count = 0
+            }
+            this.count += 1
+            if (this.count > 20) {
+              this.isdetected = '已检测到人脸，正在识别'
+              this.getPhoto()
+            }
+          } else {
+            this.count -= 1
+            if (this.count < 0){
+              this.isdetected = '请您保持脸部在画面中央'
+            }
+          }
+
+
+        });
+        // 视频中心展示文字
+        this.context.fillText(this.isdetected, 100,30);
+      },
+      // 停止监听
+      onStopTracking() {
+        this.trackerTask.stop();
+        this.video.pause();
+        // 关闭摄像头
+        this.video.srcObject = null
+        window.stream.getTracks().forEach(track => track.stop())
+
+      },
+      // 获取人脸照片
+      getPhoto(){
+        this.isdetected = ''
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        let video = document.getElementById('video')
+        this.context.drawImage(video, 0,0, this.canvas.width, this.canvas.height)
+        let dataUrl = this.canvas.toDataURL('image/jpeg', 1);
+        this.imgbase64 = dataUrl.replace(/^data:image\/\w+;base64,/, "");
+        // 开始人脸识别
+        this.postFace()
+
+      },
+      // 人脸验证
+      postFace(){
+        this.loding = '正在识别中,请稍后................'
+        this.registerForm.face = this.imgbase64
+        console.log(this.imgbase64)
+        this.loding = ''
+      },
+      // 视频流启动
+      getMediaStreamSuccess(stream) {
+        window.stream = stream
+        this.video.srcObject = stream
+      },
+      // 视频媒体流失败
+      getMediaStreamError(error) {
+        alert('视频媒体流获取错误' + error)
+      },
+    },
+    mounted() {
+      this.video = this.$refs.videoDom
+      this.canvas = this.$refs.canvasDOM
+    },
+    destroyed() {
+
     }
   }
 </script>
@@ -107,7 +218,7 @@
   }
   .login_box {
     width: 450px;
-    height: 500px;
+    height: 100%;
     background-color: #fff;
     border-radius: 3px;
     position: absolute;
@@ -143,5 +254,24 @@
   .btns {
     display: flex;
     justify-content: flex-end;
+  }
+  .user-icon {
+    margin-top: 20px;
+    width: 500px;
+    height: 500px;
+  }
+  .button {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    margin: 0 auto;
+    background-color: skyblue;
+    color: white;
+    text-align: center;
+    border-radius: 5px;
+    font-size: 16px;
+  }
+  video, canvas {
+    position: absolute;
   }
 </style>
