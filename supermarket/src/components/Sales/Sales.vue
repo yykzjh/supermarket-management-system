@@ -23,7 +23,7 @@
     </el-row>
 
 
-    <el-card style="margin-top: 15px">
+    <el-card style="margin-top: 25px">
       <el-table :data="ordersList" :span-method="spanMethod" border stripe style="width: 100%">
         <el-table-column prop="datetime" label="时间"></el-table-column>
         <el-table-column prop="good_name" label="名称"></el-table-column>
@@ -62,6 +62,9 @@ export default {
       const myChart = this.$echarts.init(document.getElementById('newEcharts'))
       setTimeout(function () {
         const option = {
+          title: {
+            text: '商品分类半年累计销售次数',
+          },
           legend: {},
           tooltip: {
             trigger: 'axis',//触发类型，'axis'为坐标系触发
@@ -144,13 +147,15 @@ export default {
             totalMoney += tempObj.amount * tempObj.price
             tempObj.datetime = res.orders[key].datetime.split(" ")[0]
             that.ordersList.push(tempObj)
+            that.rowUnit.push(0)
           }
+          that.rowUnit.pop(0)
           let tempObj2 = {time: res.orders[key].datetime.split(" ")[0], total: totalMoney}
           that.scollPrice.push(tempObj2)
         });
         // console.log(that.ordersList)
         // console.log(that.scollPrice)
-        // console.log(that.rowUnit)
+        console.log(that.rowUnit)
       }
     },
     // 播放销售订单
@@ -158,31 +163,18 @@ export default {
       setInterval(this.change, 2000);//每两秒执行一次插入删除操作
     },
     spanMethod({ row, column, rowIndex, columnIndex }){
-      if(columnIndex === 0){
-<<<<<<< HEAD
-        if(rowIndex === this.tableIndex){ //每次相等table的游标都下移rowUnit单位
-          this.tableIndex += this.rowUnit[this.UnitIndex]
+      if(columnIndex === 0) {
+        if (this.rowUnit[rowIndex] > 0) { //每次相等table的游标都下移rowUnit单位
           return {
-            rowspan: this.rowUnit[this.UnitIndex++], // 每次unit下标加一
+            rowspan: this.rowUnit[rowIndex], // 每次unit下标加一
             colspan: 1
           };
-        }else {
+        } else {
           return {
-            rowspan: 1,
-            colspan: 1
-=======
-        if (this.testID[rowIndex] >=  0) {
-            return {
-              rowspan: this.rowUnit[this.testID[rowIndex]],
-              colspan: 1
-            };
-          } else {
-            return {
-              rowspan: 0,
-              colspan: 0
-            }
->>>>>>> ef30876c57a234966cc030f30838a23b02b0886a
+            rowspan: 0,
+            colspan: 0
           }
+        }
       }
     },
     change() {
