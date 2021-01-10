@@ -119,3 +119,5 @@ def statisticInformation():
         data[province['name']] = divideCity(province['name'])
 
     return jsonify(data=data)
+
+

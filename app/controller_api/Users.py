@@ -203,7 +203,7 @@ def register():
         'group_id':'admin',
         'user_id':user_id,
         'user_info':user_password,
-        'quality_control':'HIGH',
+        'quality_control':'NORMAL',
         'liveness_control':'HIGH'
     }
     params = json.dumps(params)
