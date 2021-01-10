@@ -1,6 +1,7 @@
 import os
 import base64
 import requests
+import json
 from flask import Blueprint, request, jsonify, session
 from app.entities.UserEntity import (select, addUser, deleteUser, details, detail, updateUser)
 
@@ -158,16 +159,86 @@ def get_access_token(client_id, client_secret):
         return response.json()['access_token']
 
 
-
+'''
+description: 用户注册
+author: yykzjh
+Date: 2021-01-10 11:30:25
+param {用户名:str} username
+param {用户密码:str} password
+param {用户人脸图片:Base64} face
+return JSON {error_code:-1/其他, error_msg:"请求失败！"/其他}
+'''
 @app_users.route("Register", methods=["POST"])
 def register():
     newUser = request.get_json()
     user_id = newUser.get('username')
     user_password = newUser.get("password")
     user_face = newUser.get('face')
-
+    # 首次请求获取access_token
     access_token = get_access_token("6TxFYc3iYRvqym28qullO4rI", "wh2im6M0fAzpa6PAdyspNLZehLculqxz")
-    return access_token
+    # 人脸注册请求路由
+    request_url = "https://aip.baidubce.com/rest/2.0/face/v3/faceset/user/add"
+    # 请求头
+    headers = {'content-type': 'application/json'}
+    # 完整的请求路由
+    complete_request_url = request_url + "?access_token=" + access_token
+    # 请求体中的请求参数
+    params = {
+        'image':user_face,
+        'image_type':'BASE64',
+        'group_id':'admin',
+        'user_id':user_id,
+        'user_info':user_password,
+        'quality_control':'HIGH',
+        'liveness_control':'HIGH'
+    }
+    params = json.dumps(params)
+    # 发送人脸注册请求
+    respnse = requests.post(complete_request_url, data=params, headers=headers)
+    # 返回信息处理
+    if respnse:
+        respnse = respnse.json()
+        return jsonify(error_code=respnse['error_code'], error_msg=respnse['error_msg'])
+
+    return jsonify(error_code=-1, error_msg="请求失败！")
+
+
+
+@app_users.route("/FaceLogin", methods=["POST"])
+def faceLogin():
+    user_info = request.get_json()
+    user_face = user_info.get('face')
+    # 首次请求获取access_token
+    access_token = get_access_token("6TxFYc3iYRvqym28qullO4rI", "wh2im6M0fAzpa6PAdyspNLZehLculqxz")
+    # 人脸搜索请求路由
+    request_url = "https://aip.baidubce.com/rest/2.0/face/v3/search"
+    # 请求头
+    headers = {'content-type': 'application/json'}
+    # 完整的请求路由
+    complete_request_url = request_url + "?access_token=" + access_token
+    # 请求体中的请求参数
+    params = {
+        'image':user_face,
+        'image_type':'BASE64',
+        'group_id_list':'admin',
+        'quality_control':'LOW',
+        'liveness_control':'NORMAL'
+    }
+    params = json.dumps(params)
+    # 发送人脸搜索请求
+    respnse = requests.post(complete_request_url, data=params, headers=headers)
+    if response:
+        response = response.json()
+        user = response['user_list'][0]
+        if user['score'] > 80:
+            token =base64.b64encode(os.urandom(24)).decode('utf-8')
+            session["token"] = token
+            user = select(user_id, user_pwd)
+            if user != None:
+                return jsonify(StatusCode=200, token=token, role_id=user.get('role_id'))
+        return jsonify(StatusCode=400, msg="没有找到匹配的用户！")
+    else:
+        return jsonify(StatusCode=400, msg="请求失败！")
     
     
     
