@@ -75,7 +75,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="电话" prop="mobile">
+          <el-table-column label="联系方式" prop="mobile">
             <template slot-scope="scope">
               <el-input
                 v-show="scope.row.isEdit"
@@ -234,7 +234,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="电话" prop="mobile">
+          <el-table-column label="联系方式" prop="mobile">
             <template slot-scope="scope">
               <el-input
                 v-show="scope.row.isEdit"
@@ -906,27 +906,29 @@ export default {
     // table筛选
     downExcel () {
       this.downloadLoading = true
-      // import("../../vender/Export2Excel").then(excel => {
-      //   const tHeader = [
-      //     "姓名", "性别", "电话", "地区", "角色"
-      //   ]
-      //   const filterVal = [
-      //     "name", "gender", "mobile", "area", "role_id"
-      //   ]
-      //   const data = this.formatJson(filterVal)
-      //   excel.export_json_to_excel({
-      //     header: tHeader,
-      //     data,
-      //     filename: "员工信息表"
-      //   })
+      import("../../vender/Export2Excel").then(excel => {
+        const tHeader = [
+          "名称", "联系方式", "省", "市", "合作起始日期", "截止日期"
+        ]
+        const filterVal = [
+          "name", "mobile", "province", "city", "sign_start", "sign_end"
+        ]
+        const data = this.formatJson(filterVal)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "供应商信息表"
+        })
         this.downloadLoading = false
-      // })
+      })
     },
-    // formatJson(filterVal) {
-    //   return this.supplierList.map(v =>
-    //     filterVal.map(j => v[j])
-    //   )
-    // },
+    formatJson(filterVal) {
+      return this.supplierList.map(v =>
+        filterVal.map(j => {
+          return v[j];
+        })
+      )
+    },
   }
 }
 </script>
