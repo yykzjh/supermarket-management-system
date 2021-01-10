@@ -39,7 +39,7 @@ param {供应商所在省:str} province
 param {供应商所在市:str} city
 param {签约起始时间:datetime} sign_start
 param {签约到期时间:datetime} sign_end
-return JSON {StatusCode:200/400, msg:"同样的位置已有同名供应商！"}
+return JSON {StatusCode:200/400, msg:"同样的位置已有同名供应商！"/Supplier.id}
 '''
 @app_suppliers.route("/NewSupplier", methods=["POST"])
 def insertSupplier():
@@ -51,8 +51,9 @@ def insertSupplier():
     sign_start = supplier_info.get('sign_start')
     sign_end = supplier_info.get('sign_end')
 
-    if addSupplier(name,mobile,province,city,sign_start, sign_end):
-        return jsonify(StatusCode=200)
+    flag = addSupplier(name,mobile,province,city,sign_start, sign_end)
+    if flag != 0:
+        return jsonify(StatusCode=200, msg=flag)
     else:
         return jsonify(StatusCode=400, msg="同样的位置已有同名供应商！")
 
