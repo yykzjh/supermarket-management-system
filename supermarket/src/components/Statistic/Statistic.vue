@@ -149,7 +149,8 @@ import '../../assets/css/charts.css'
             money: [],
             chartInstance: null,
             moneyMax: 0,
-            unit: null
+            unit: null,
+            moneyTotal: 10,
         }
     },
     mounted() {
@@ -201,11 +202,14 @@ import '../../assets/css/charts.css'
                     }
                 },
                 tooltip: {
-                    trigger: 'item',//'axis'
-                    formatter: function(arg){
-                        // console.log(arg)
-                        return arg.seriesName + ': ' + arg.value
-                    }
+                    trigger: 'axis',// 'item'
+                    axisPointer: 'cross'
+                    // formatter: function(arg){
+                    //     // console.log(arg[2].seriesName)
+                    //     return arg[2].seriesName + ': ' + arg[2].value.toFixed(2) + '\n'
+                    //     arg[0].seriesName + ': ' + arg[0].value.toFixed(2) + '\n' + 
+                    //     arg[1].seriesName+ ': ' + arg[1].value.toFixed(2)
+                    // }
                 },
                 xAxis: {
                     data: this.xAxisData,
@@ -312,20 +316,24 @@ import '../../assets/css/charts.css'
             var postData = {'startTime':startTime,'endTime':endTime,'catId':1,'unit':this.unit,'timeLength':this.valueAddLength}
             var ret = await this.$http.post('/PurchaseOrders/ExpenditureOfDivideTime', postData)
             // 需要写获取失败的判断
-            var jsonData = ret.data.results
-            console.log(jsonData.length)
+            var jsonData1 = ret.data.results// expenditure
+            var ret = await this.$http.post('/HistoryOrders/RevenueOfDivideTime', postData)
+            var jsonData2 = ret.data.results// revenue
+
+            console.log(jsonData1.length)
             this.moneyMax = 0
-            for (var i = 0; i < jsonData.length; i++) {
-                // console.log(i,jsonData[i].startTime)
-                this.xAxisData.push(i);//jsonData[i].startTime
-                this.moneyIn.push(jsonData[i].expenditure)
-                this.moneyOut.push(-jsonData[i].expenditure)
+            this.moneyTotal = 0
+            for (var i = 0; i < jsonData1.length; i++) {
+                // console.log(i,jsonData1[i].startTime)
+                this.xAxisData.push(i);//jsonData1[i].startTime
+                this.moneyIn.push(jsonData2[i].revenue)
+                this.moneyOut.push(-jsonData1[i].expenditure)
                 this.money.push(this.moneyIn[i] + this.moneyOut[i])
-                if(jsonData[i].expenditure > this.moneyMax) {
-                    this.moneyMax = jsonData[i].expenditure
-                }
+                this.moneyTotal += this.money[i]
+                if(jsonData1[i].expenditure > this.moneyMax)  this.moneyMax = jsonData1[i].expenditure
+                if(jsonData2[i].revenue > this.moneyMax)  this.moneyMax = jsonData2[i].revenue
             }
-            console.log(this.moneyIn)
+            console.log(this.moneyIn,this.moneyTotal)
             this.updateChart()
         },
         updateChart() { 
@@ -366,7 +374,7 @@ import '../../assets/css/charts.css'
                 this.xAxisData.push('Dy' + i)
                 this.moneyIn.push(parseFloat((Math.random() * 2).toFixed(2)))
                 this.moneyOut.push(parseFloat(-Math.random().toFixed(2)))
-                this.money.push(this.moneyIn[i] + this.moneyOut[i])
+                this.money.push((this.moneyIn[i] + this.moneyOut[i]).toFixed(2))
                 // console.log(this.moneyIn[i])
             }
             this.moneyMax = 6
