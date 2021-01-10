@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify, session
 from app.entities.SupplierEntity import (details, addSupplier, deleteSupplier, updateSupplier,
-    divideProvince, divideCity )
+    divideProvince, divideCity, fuzzySearch, searchByPosition)
 
 
 app_suppliers = Blueprint("app_suppliers", __name__)
@@ -121,3 +121,31 @@ def statisticInformation():
     return jsonify(data=data)
 
 
+'''
+description: 根据供应商名或者电话模糊搜索所有匹配的供应商
+author: yykzjh
+Date: 2021-01-10 14:55:47
+param {匹配文本:str} text
+return {suppliers:[Supplier]}
+'''
+@app_suppliers.route("/SeachByNameOrMobile", methods=["GET"])
+def seachByNameOrMobile():
+    text = request.args.get('text')
+    suppliers = fuzzySearch(text)
+    return jsonify(suppliers=suppliers)
+
+
+'''
+description: 根据供应商省市搜索所有匹配的供应商
+author: yykzjh
+Date: 2021-01-10 14:58:25
+param {省名:str} province
+param {市名:str} city
+return {suppliers:[Supplier]}
+'''
+@app_suppliers.route("/SearchByPosition", methods=["GET"])
+def SearchByProvinceAndCity():
+    province = request.args.get('province')
+    city = request.args.get("city")
+    suppliers = searchByPosition(province, city)
+    return jsonify(suppliers=suppliers)
