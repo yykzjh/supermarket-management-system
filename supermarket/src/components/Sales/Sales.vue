@@ -63,9 +63,13 @@ export default {
       setTimeout(function () {
         const option = {
           title: {
+            top: 0,
+            left: 'center',
             text: '商品分类半年累计销售次数',
           },
-          legend: {},
+          legend: {
+            bottom: 0,
+          },
           tooltip: {
             trigger: 'axis',//触发类型，'axis'为坐标系触发
             showContent: false//是否显示提示框浮层
@@ -84,6 +88,7 @@ export default {
             {type: 'line', smooth: true, seriesLayoutBy: 'row'},
             {
               type: 'pie',
+              top: 20,
               id: 'pie',  //组件ID
               radius: '30%',  //饼图的半径
               //center:饼圆的中心(圆心)坐标，第一项是横坐标，第二项是纵坐标
