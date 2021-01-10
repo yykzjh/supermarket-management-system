@@ -9,8 +9,8 @@
       <!--登录表单区 v-model是双向绑定对象 :model是单向绑定对象-->
       <el-form ref="registerFormRef" :model="registerForm" :rules="registerFormRules" label-width="0px" class="login_form">
         <!--用户名-->
-        <el-form-item prop="id">
-          <el-input v-model="registerForm.id" prefix-icon="iconfont icon-user">
+        <el-form-item prop="username">
+          <el-input v-model="registerForm.username" prefix-icon="iconfont icon-user">
           </el-input>
         </el-form-item>
         <!--密码-->
@@ -22,7 +22,7 @@
           <el-input v-model="repassword" prefix-icon="iconfont icon-3702mima" type="password" placeholder="请再次输入密码"></el-input>
         </el-form-item>
 
-        <el-form-item prop="icon">
+        <el-form-item prop="face">
           <el-button type="text">上传个人图片</el-button>
           <el-upload   action="#" ref="upload" list-type="picture" :http-request="httpRequest">
           <i class="el-icon-plus"></i>
@@ -43,23 +43,30 @@
       return {
         // 登录表单的数据绑定对象
         registerForm: {
-          icon: '',
-          id: '',
-          password: '',
+          "username": '',
+          "password": '',
+          "name": '',
+          "gender": '',
+          "birthday": "2020-11-11 00:00:00",
+          "mobile": '',
+          "salary": 2000,
+          "area": '',
+          "role_id": 2,
+          "face": ''
         },
         repassword: '',
         // 表单的验证规则对象
         // 首先在表单外部声明rules 而后再将每一个规则赋给具体的元素，例如第一个输入文本框，给它赋值一个prop
         registerFormRules: {
           // 验证用户名是否合法
-          id: [
+          username: [
             { required: true, message: '请输入注册用户名', trigger: 'blur' },
           ],
           // 验证密码是否合法
           password: [
             { required: true, message: '请输入注册密码', trigger: 'blur' },
           ],
-          icon: [
+          face: [
             { required: true, message: '请输入登录密码', trigger: 'blur' },
           ]
         }
@@ -72,14 +79,21 @@
         let file = data.file
         rd.readAsDataURL(file)
         rd.onloadend = function(e) {
-          _this.registerForm.icon = this.result
+          _this.registerForm.face = this.result
         }
       },
-      registerUser() {
-        this.registerForm.icon = this.registerForm.icon.replace(/data:image\/.*;base64,/,'')
+      async registerUser() {
+        this.registerForm.face = this.registerForm.face.replace(/data:image\/.*;base64,/,'')
         if(this.registerForm.password !== this.repassword)
           this.$message.error('两次输入密码不一致，请重新输入')
-        console.log(this.registerForm)
+        // console.log(this.registerForm)
+        const {data : res} = await this.$http.post('/Users/Register', this.registerForm)
+        if(res.StatusCode !== 200) {
+          this.$message.error('注册失败')
+          console.log(res)
+        }
+        else
+          this.$message.success('请求成功')
       }
     }
   }

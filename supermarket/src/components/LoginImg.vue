@@ -118,33 +118,19 @@
         this.postFace()
 
       },
-      // 初始化调用Token
-      getToken(){
-        this.$axios.post('http://192.168.50.35:3000/getToken',{}).then((res)=>{
-          this.access_token = res.data.access_token
-        })
-      },
       // 人脸验证
-      postFace(){
+      async postFace(){
         this.loding = '正在识别中,请稍后................'
-        this.$axios.post('http://192.168.50.35:3000/checkFace',{
-          access_token: this.access_token,
-          img: this.imgbase64
-        }).then((res)=>{
-          console.log(res)
-          this.loding = ''
-          if(res.data.error_code !== 0){
-            if(res.data.error_code == 223120){
-              alert('活体监测失败')
-            }
-          }else {
-            if(res.data.result.user_list[0].score > 80){
-              alert('人脸识别成功')
-            }else{
-              alert('人脸识别失败,查不到')
-            }
-          }
+        const {data: res} = await this.$http.post('/Users/FaceLogin',{
+          "face": this.imgbase64
         })
+
+        this.loding = ''
+        if(res.StatusCode !== 200){
+          this.$message.error('失败')
+        }else {
+          this.$message.success('成功')
+        }
       },
       // 视频流启动
       getMediaStreamSuccess(stream) {
@@ -159,9 +145,6 @@
     mounted() {
       this.video = this.$refs.videoDom
       this.canvas = this.$refs.canvasDOM
-
-      //初始化获取tonken
-      this.getToken();
     },
     destroyed() {
 
