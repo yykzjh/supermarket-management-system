@@ -73,7 +73,9 @@ def goodDetail(good_id):
     if good == None:
         return None
     else:
-        return good.to_dict()
+        good = good.to_dict()
+        good['name'] = Category.query.get(good_id).name
+        return good
 
 
 '''

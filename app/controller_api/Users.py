@@ -1,5 +1,6 @@
 import os
 import base64
+import requests
 from flask import Blueprint, request, jsonify, session
 from app.entities.UserEntity import (select, addUser, deleteUser, details, detail, updateUser)
 
@@ -147,3 +148,26 @@ def updateRoleId():
     else:
         return jsonify(StatusCode=400)
 
+
+def get_access_token(client_id, client_secret):
+    # client_id 为官网获取的AK， client_secret 为官网获取的SK
+    host = 'https://aip.baidubce.com/oauth/2.0/token?grant_type=client_credentials&client_id=' + client_id + \
+            '&client_secret=' + client_secret
+    response = requests.get(host)
+    if response:
+        return response.json()['access_token']
+
+
+
+@app_users.route("Register", methods=["POST"])
+def register():
+    newUser = request.get_json()
+    user_id = newUser.get('username')
+    user_password = newUser.get("password")
+    user_face = newUser.get('face')
+
+    access_token = get_access_token("6TxFYc3iYRvqym28qullO4rI", "wh2im6M0fAzpa6PAdyspNLZehLculqxz")
+    return access_token
+    
+    
+    
