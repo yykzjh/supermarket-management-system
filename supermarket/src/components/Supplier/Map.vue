@@ -709,7 +709,7 @@ export default {
 
         var tempCopy = {}
         Object.assign(tempCopy, {
-          'id': ret.id,// 供应商id
+          'id': ret.msg,// 供应商id
           'name': this.addSupplierForm.name,
           'mobile': this.addSupplierForm.mobile,
           'sign_start': this.addSupplierForm.sign_start,

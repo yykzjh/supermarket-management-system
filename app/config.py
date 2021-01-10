@@ -5,7 +5,7 @@ class Config1(object):
 
     # 开启DEBUG模式
     DEBUG = True
-    
+
     #设置密钥
     SECRET_KEY = "fjhfdsfhdgsjdsjaffgaj"
 

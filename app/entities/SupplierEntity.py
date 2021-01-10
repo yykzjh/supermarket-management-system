@@ -26,13 +26,13 @@ def details():
 def addSupplier(name, mobile, province, city, sign_start, sign_end):
     supplier = Supplier.query.filter_by(name=name, province=province, city=city).first()
     if supplier != None:
-        return False
+        return 0
 
     newSupplier = Supplier(name=name, mobile=mobile, province=province, \
                         city=city, sign_start=sign_start, sign_end=sign_end)
     db.session.add(newSupplier)
     db.session.commit()
-    return True
+    return newSupplier.id
 
 
 def deleteSupplier(supplier_id):
