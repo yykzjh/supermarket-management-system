@@ -219,23 +219,94 @@
       :visible.sync="drawer"
       size="50%">
       <el-table
-        :data="regionSupplierList"
-        stripe
-        style="margin-top:-15px;">
-        <el-table-column type="index"></el-table-column>
-        <el-table-column label="名称" prop="name"></el-table-column>
-        <el-table-column label="电话" prop="mobile"></el-table-column>
-        <el-table-column label="地区" prop="area"></el-table-column>
-        <el-table-column label="合作起始日期" prop="sign_start"></el-table-column>
-        <el-table-column label="截止日期" prop="sign_end"></el-table-column>
-        <!-- <el-table-column label="供应项目" prop="provide"></el-table-column> -->
-        <el-table-column label="可执行操作">
-          <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" circle size="mini" @click="ShowEditDialog(scope.row)"></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle size="mini" @click="DeleteSupplier(scope.row.id)"></el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+        :data="regionSupplierList.slice((pageNum-1)*pageSize, pageNum*pageSize)"
+        stripe>
+          <el-table-column type="index"></el-table-column>
+          <el-table-column label="名称" prop="name">
+            <template slot-scope="scope">
+              <el-input
+                v-show="scope.row.isEdit"
+                v-model="scope.row.name">
+              </el-input>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.name}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="电话" prop="mobile">
+            <template slot-scope="scope">
+              <el-input
+                v-show="scope.row.isEdit"
+                v-model="scope.row.mobile">
+              </el-input>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.mobile}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="地区" prop="area">
+            <template slot-scope="scope">
+              <span>
+                <!-- v-show="!scope.row.isEdit" -->
+                <!-- 不隐藏当参考 -->
+                {{scope.row.area}}
+              </span>
+              <el-cascader class="width"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.area"
+                :options="cityData"
+                :props="{ expandTrigger: 'hover',value:'value',label:'label',children:'children' }">
+              </el-cascader>
+            </template>
+          </el-table-column>
+          <el-table-column label="合作起始日期" prop="sign_start">
+            <template slot-scope="scope">
+              <el-date-picker
+                value-format="yyyy-MM-dd"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.sign_start"
+                type="date"/>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.sign_start}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="截止日期" prop="sign_end">
+            <template slot-scope="scope">
+              <el-date-picker
+                value-format="yyyy-MM-dd"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.sign_end"
+                type="date"/>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.sign_end}}
+              </span>
+            </template>
+          </el-table-column>
+          <!-- <el-table-column label="供应项目" prop="provide"></el-table-column> -->
+          <el-table-column label="可执行操作">
+            <template slot-scope="scope">
+              <el-button type="close" icon="el-icon-close" size="mini" @click="CancleEdit(scope.row)" v-show="scope.row.isEdit"></el-button>
+              <el-button type="success" icon="el-icon-check" size="mini" @click="SaveChange(scope.row)" v-show="scope.row.isEdit"></el-button>
+              <el-button type="primary" icon="el-icon-edit" size="mini" @click="ShowEditDialog(scope.row)" v-show="!scope.row.isEdit"></el-button>
+              <!-- <el-button disabled type="primary" icon="el-icon-edit" size="mini" @click="ShowEditDialog(scope.row)" v-show="!scope.row.isEdit"></el-button> -->
+              <el-button type="danger" icon="el-icon-delete" size="mini" @click="DeleteSupplier(scope.row.id)" v-show="!scope.row.isEdit"></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="pageNum"
+          :page-sizes="[1, 2, 5, 10]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pageTotal">
+        </el-pagination>
     </el-drawer>
   </div>
 </template>
@@ -552,14 +623,16 @@ export default {
       this.chartInstance.setOption(adaptOption)
       this.chartInstance.resize()
     },
-    SuppliersDrawer(cityName) {
+    async SuppliersDrawer(cityName) {
       // console.log(cityName)
-      if ( !this.suplliersIncity[cityName]) {
-        console.log('nothing')
-        // 根据城市名 请求该城市下所有供应商信息
-
+      // console.log(this.nowPlace, cityName)
+      var ret = await this.$http.get('/Suppliers/SearchByPosition?province=' + this.nowPlace+"&city="+cityName)
+      console.log(ret)
+      if(ret.status != 200) console.log('Network 获取该城市供应商列表失败')
+      else {
+        var listTemp = ret.data.suppliers
+        this.ListTemp2SuppliersList(listTemp, 2)
       }
-      this.regionSupplierList = this.suplliersIncity[cityName]
       this.drawer = true
       this.drawerTitle = cityName
     },
@@ -647,6 +720,20 @@ export default {
         this.InitSupplier()
       }
     },
+    ListTemp2SuppliersList(listTemp, level) {
+      this.pageTotal = listTemp.length
+      var time
+      for (var i in listTemp) {
+        time = new Date(listTemp[i]['sign_start'])
+        listTemp[i]['sign_start'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+        time = new Date(listTemp[i]['sign_end'])
+        listTemp[i]['sign_end'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+        listTemp[i]['area'] = listTemp[i]['province'] + listTemp[i]['city']
+        listTemp[i]['isEdit'] = false
+      }
+      if(level == 1) this.supplierList = listTemp
+      else if(level == 2) this.regionSupplierList = listTemp
+    },
     async AllSupplier() {
       var ret = await this.$http.get('/Suppliers/SuppliersInfo')
       // this.supplierList = [
@@ -670,17 +757,7 @@ export default {
       // ]
       // console.log(this.supplierList)
       var listTemp = ret.data.suppliers
-      this.pageTotal = listTemp.length
-      var time
-      for (var i in listTemp) {
-        time = new Date(listTemp[i]['sign_start'])
-        listTemp[i]['sign_start'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
-        time = new Date(listTemp[i]['sign_end'])
-        listTemp[i]['sign_end'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
-        listTemp[i]['area'] = listTemp[i]['province'] + listTemp[i]['city']
-        listTemp[i]['isEdit'] = false
-      }
-      this.supplierList = listTemp
+      this.ListTemp2SuppliersList(listTemp, 1)
       // this.supplierList = ret.data.suppliers
       // this.pageTotal = this.supplierList.length
       // var time
@@ -695,13 +772,11 @@ export default {
       // console.log(this.supplierList)
     },
     async ScreenSupplier() {// 根据输入的条件筛选供应商
-      // var ret = await this.$http.get('/Suppliers/GetSuppliers', {
-      //   params: {
-      //     condition: this.inputCondition
-      //   }
-      // })
-      // this.supplierList = ret.supplier
-      // console.log(this.supplierList)
+    if(this.inputCondition=='') return
+      var ret = await this.$http.get('/Suppliers/SeachByNameOrMobile?text=' + this.inputCondition)
+      var listTemp = ret.data.suppliers
+      this.ListTemp2SuppliersList(listTemp, 1)
+      console.log(this.supplierList)
     },
     async SaveChange(row) {// line-110
       // console.log(typeof(row.area),row.area)
