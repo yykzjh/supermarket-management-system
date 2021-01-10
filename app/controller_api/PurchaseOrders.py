@@ -97,7 +97,8 @@ description: 返回所有订货订单
 author: yykzjh
 Date: 2021-01-09 16:12:54
 param {无}
-return {purchaseOrders:[dict]} dict:{good_id, good_name, supplier_id, build_time, finish_time, if_shelf, if_finish}
+return {purchaseOrders:[dict]} dict:{good_id, good_name, supplier_id, supplier_name, buildtime, 
+        finishtime, amount, price_in, if_shelf, if_finish}
 '''
 @app_purchase_orders.route("/AllPurchaseOrders", methods=["GET"])
 def allPurchaseOrders():
