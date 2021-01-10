@@ -340,7 +340,7 @@ export default {
       nowPosition: null,
       nowPlace: null,
       // numSupplier: [],
-      timesMax: 20,
+      timesMax: 8,
       timesData: {
         "中国":[
           { "name": "北京", "value": 15 },
@@ -543,6 +543,7 @@ export default {
         ],
       }
       this.chartInstance.setOption(returnOption)
+      this.nowPlace = '中国'
       this.nowPosition = 1
     },
     async getGlobalData() {
@@ -574,8 +575,21 @@ export default {
       for (var i in this.citysTemp) {
         if(this.citysTemp[i]['name'] == place){
           this.citysTemp[i]['value'] = this.citysTemp[i]['value'] + ops
-          break
+          return
         }
+      }
+      if(ops == 1) {
+        // console.log(this.citysTemp)
+        // const len = this.citysTemp.length
+        // console.log(len)
+        if(this.citysTemp != null)// 中国某个没有供应商的省
+          this.citysTemp.push({
+            'name': place,
+            'value': 1
+          })
+        else this.citysTemp = { 'name': place, 'value':1} // 该省第一次进驻供应商
+      } else {
+        console.log('Bug 这个地方没有供应商却要删除-1')
       }
     },
     getPlaceData(province, city, op) {
@@ -586,9 +600,11 @@ export default {
         ops = 1
         this.citysTemp = this.timesData['中国']
         this.UpdateCitysValue(ops, province)
+        // console.log(this.timesData['中国'])
 
         this.citysTemp = this.timesData[province]
         this.UpdateCitysValue(ops, city)
+        // console.log(this.timesData[province])
         
       } else if(op == 'delete') {
         ops = -1
@@ -599,15 +615,15 @@ export default {
         this.UpdateCitysValue(ops, city)
       }
       // console.log(this.nowPlace)
-      this.updateChart(this.nowPlace)
+      this.updateChart()
     },
     // 更新当前地理位置图表
-    updateChart(place) {
-      console.log(this.timesData[place])
+    updateChart() {
+      // console.log(this.timesData[this.nowPlace])
       const newOption = {
         series: [
           {
-            data: this.timesData[place]
+            data: this.timesData[this.nowPlace]
           }
         ],
       }
