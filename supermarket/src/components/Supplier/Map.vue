@@ -2,8 +2,12 @@
   商家地理位置分布
  -->
 <template>
-  <div class="chart-container" @dblclick="returnChinaMap">
+  <div class="chart-container">
     <div>
+      <el-breadcrumb separator="/" style="margin:0 0 0px 0;float:left;padding:13px;">
+        <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+        <el-breadcrumb-item>供应商</el-breadcrumb-item>
+      </el-breadcrumb>
       <el-dropdown style="padding-right: 5px">
         <span class="el-dropdown-link">
             切换<i class="el-icon-caret-bottom el-icon--right"></i>
@@ -16,7 +20,7 @@
       <el-button icon="el-icon-plus" circle @click="ChangeAddState(true)"></el-button>
     </div>
 
-    <div class="chart-chart" ref="map_ref" v-show="!valueSwitch"></div>
+    <div class="chart-chart" ref="map_ref" v-show="!valueSwitch" @dblclick="returnChinaMap"></div>
 
     <div v-show="valueSwitch" style="padding-top: 5px">
       <el-card class="box-card">

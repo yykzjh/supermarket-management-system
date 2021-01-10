@@ -4,21 +4,28 @@
       class="box-card"
       style="width:40%; float:left"
       id="card1">
-      <div slot="header" class="clearfix">
-        <span id="spanTitle"></span>
-        <span>
+      <div slot="header">
+        <!-- <span id="spanTitle"></span> -->
+        <el-breadcrumb separator="/" style="margin:0 0 0px 0;">
+          <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+          <el-breadcrumb-item :to="{ path: '/category' }">商品管理</el-breadcrumb-item>
+          <el-breadcrumb-item>商品详情</el-breadcrumb-item>
+        </el-breadcrumb>
+        <!-- <span>
           <el-button
             style="float: right; padding: 3px 0"
             type="text">
-            <!-- 编辑 -->
+            编辑
           </el-button>
-        </span>
+        </span> -->
       </div>
       <div style="width:100%; height: 300px; margin:-40px 0px -30px 0px" ref="pie_ref"></div>
       <div style="height: 300px;">
         <el-form ref="form" :model="form" label-width="80px">
           <el-form-item label="商品名称">
-            <span style="margin-left: 10px;">{{form.name}}</span>
+            <el-badge :value="form.id" class="item" type="primary">
+              <span style="margin-left: 10px;">{{form.name}}</span>
+            </el-badge>
           </el-form-item>
           <!-- <el-form-item label="摆放区域">
             <el-select v-model="form.region" placeholder="请选择活动区域">
@@ -161,6 +168,7 @@
           [ '2018-07-02', 0.5 ],
         ],// 售价变化数组
         form: {
+          id: 6,
           name: '超级大汉堡',
           // region: 'A1',
           // date1: '2020-01-01 08:00:00',
@@ -177,7 +185,7 @@
       console.log(this.goodid)
     },
     mounted() {
-      document.getElementById('spanTitle').innerText = this.goodid
+      // document.getElementById('spanTitle').innerText = this.goodid
       this.GetPieData()
       this.GetGoodDetails()
       // this.GetLineData()
@@ -221,8 +229,17 @@
               radius: ['50%', '70%'],
               avoidLabelOverlap: false,
               label: {
-                  show: false,
-                  position: 'center'
+                  show: true,
+                  position: 'outside',
+                  // position: 'center'
+              },
+              labelLine: {
+                lineStyle: {
+                  color: 'rgba(255, 255, 255, 0.4)'
+                },
+                smooth: 0.2,
+                length: 10,
+                length2: 20
               },
               emphasis: {
                   label: {
@@ -479,12 +496,13 @@
         if(ret.StatusCode == 400) {
           console.log('123456未查到该商品芜湖')
         } else {
-          console.log(ret.good)
+          // console.log(ret.good)
           // console.log('这部分实际上也可以显示它的供应商等信息，点击跳转那种')
 
           if(ret.good.name != null)  this.form.name = ret.good.name
-          if(ret.good.type != null)  this.form.type = ret.good.parentCat
+          if(ret.good.parentCat != null)  this.form.type = ret.good.parentCat
           if(ret.good.intro != null)  this.form.intro = ret.good.intro
+          if(ret.good.parentId != null)  this.form.parentId = ret.good.parentId
         }
       },
       async GetLineData() {
