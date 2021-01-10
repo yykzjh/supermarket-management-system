@@ -1,5 +1,9 @@
 <template>
     <div class="chart-container">
+        <el-breadcrumb separator="/" style="margin:0 0 0px 0;float:left;padding:13px;">
+            <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>财务分析</el-breadcrumb-item>
+        </el-breadcrumb>
         <div>
             <!-- <el-switch
                 style="float:left; display: block; padding-bottom: 5px;"

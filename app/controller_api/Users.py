@@ -260,7 +260,7 @@ def faceLogin():
             if user['score'] > 80:
                 token =base64.b64encode(os.urandom(24)).decode('utf-8')
                 session["token"] = token
-                user = select(user_id, user_pwd)
+                user = select(response['user_list'][0]['user_id'],response['user_list'][0]['user_info'])
                 if user != None:
                     return jsonify(StatusCode=200, token=token, role_id=user.get('role_id'))
             return jsonify(StatusCode=400, msg="没有找到匹配的用户！")
