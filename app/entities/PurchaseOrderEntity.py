@@ -5,7 +5,7 @@ Description: 进货记录的方法接口
 '''
 
 from sqlalchemy import (or_, func, and_)
-from app.models import db, Purchase, to_json, Good, Category
+from app.models import db, Purchase, to_json, Good, Category, Supplier
 
 
 '''
@@ -32,11 +32,12 @@ def details():
     purchaseOrders = to_json(Purchase.query.all())
     for purchaseOrder in purchaseOrders:
         purchaseOrder['good_name'] = Category.query.get(purchaseOrder['good_id']).name
+        purchaseOrder['supplier_name'] = Supplier.query.get(purchaseOrder['supplier_id']).name
     return purchaseOrders
 
 
 def finishPurchaseOrder(good_id, supplier_id, build_time):
-    order = Purchase.query.filter_by(good_id=good_id, supplier_id=supplier_id, build_time=build_time).first()
+    order = Purchase.query.filter_by(good_id=good_id, supplier_id=supplier_id, buildtime=build_time).first()
     if order == None:
         return 0
     elif order.if_finish == True:
