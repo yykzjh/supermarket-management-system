@@ -5,12 +5,12 @@ class Config1(object):
 
     # 开启DEBUG模式
     DEBUG = True
-
+    
     #设置密钥
     SECRET_KEY = "fjhfdsfhdgsjdsjaffgaj"
 
     # sqlalchemy的配置参数
-    SQLALCHEMY_DATABASE_URI = "mysql://root:sww533212@127.0.0.1:3306/supermarket"
+    SQLALCHEMY_DATABASE_URI = "mysql://root:123456@127.0.0.1:3306/supermarket"
 
     # 设置sqlalchemy自动跟踪数据库
     SQLALCHEMY_TRACK_MODIFICATIONS = True
