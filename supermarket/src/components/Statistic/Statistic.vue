@@ -125,6 +125,8 @@ import '../../assets/css/charts.css'
             },
             picker2: '',
             picker1: '',
+            startTime: '2020-01-01 08:00:00',
+            endTime: '2020-01-01 08:00:00',
             //Selector
             optionsSelector: [{
                 valueSelect: 'year',
@@ -151,6 +153,8 @@ import '../../assets/css/charts.css'
             moneyMax: 0,
             unit: null,
             moneyTotal: 10,
+            moneyTotalIn: 20,
+            moneyTotalOut: 10
         }
     },
     mounted() {
@@ -174,6 +178,15 @@ import '../../assets/css/charts.css'
             }
             const initOption = {
                 backgroundColor: '#eee',
+                title: {
+                    bottom: 0,
+                    left: 'center',
+                    // text: ,
+                    subtext: this.startTime + ' 至 ' + this.endTime + '\n' +
+                     '利润(元):' + this.moneyTotal +
+                      '  收入:' + this.moneyTotalIn +
+                       '  支出:' + this.moneyTotalOut,
+                },
                 legend: {
                     data: ['收入', '支出', '收益'],
                     left: 10,
@@ -291,20 +304,48 @@ import '../../assets/css/charts.css'
             }
             this.chartInstance.setOption(initOption)
         },
+        TimeFormat(time) {
+            var date_ = new Date(time)
+            var year = date_.getFullYear()
+            var month = date_.getMonth()+1
+            var day = date_.getDate()
+            if(month<10) month = "0"+month
+            if(day<10) day = "0"+day
+
+            var hours = date_.getHours()
+            var mins = date_.getMinutes()
+            var secs = date_.getSeconds()
+            var msecs = date_.getMilliseconds()
+            if(hours<10) hours = "0"+hours
+            if(mins<10) mins = "0"+mins
+            if(secs<10) secs = "0"+secs
+            if(msecs<10) secs = "0"+msecs
+            // console.log(year+"/"+month+"/"+day+" "+hours+":"+mins+":"+secs)
+            return  year+"-"+month+"-"+day+" "+hours+":"+mins+":"+secs
+        },
         async getData() {
             this.cleanContainer()
-            var startTime = null
-            var endTime = null
+            this.startTime = null
+            this.endTime = null
             // "picker"+String(this.valueSwitch?1:0)
             if(this.valueSwitch) {// 某一天
                 // console.log(this.picker1)
-                startTime=this.picker1+" 00:00:00"
-                endTime=this.picker1+" 23:59:59"
+                this.startTime=this.picker1+" 00:00:00"
+                this.endTime=this.picker1+" 23:59:59"
             } else {// 某一时间段
                 // console.log(this.picker2)
-                startTime=this.picker2[0]
-                endTime=this.picker2[1]
+                this.startTime=this.picker2[0]
+                this.endTime=this.picker2[1]
             } 
+            if(this.startTime==null || this.endTime==null) {
+                console.log('时间范围没选好，默认查三个月')
+                const end = new Date();
+                const start = new Date();
+                start.setTime(start.getTime() - 3600 * 1000 * 24 * 90);
+                this.startTime = this.TimeFormat(start)
+                this.endTime = this.TimeFormat(end)
+                // return
+            }
             // console.log(startTime)
             // console.log(endTime)
 
@@ -313,7 +354,7 @@ import '../../assets/css/charts.css'
             if(this.valueSelect == '')  this.unit = 'day'
             else  this.unit = this.valueSelect
 
-            var postData = {'startTime':startTime,'endTime':endTime,'catId':1,'unit':this.unit,'timeLength':this.valueAddLength}
+            var postData = {'startTime':this.startTime,'endTime':this.endTime,'catId':1,'unit':this.unit,'timeLength':this.valueAddLength}
             var ret = await this.$http.post('/PurchaseOrders/ExpenditureOfDivideTime', postData)
             // 需要写获取失败的判断
             var jsonData1 = ret.data.results// expenditure
@@ -323,13 +364,17 @@ import '../../assets/css/charts.css'
             console.log(jsonData1.length)
             this.moneyMax = 0
             this.moneyTotal = 0
+            this.moneyTotalIn = 0
+            this.moneyTotalOut = 0
             for (var i = 0; i < jsonData1.length; i++) {
                 // console.log(i,jsonData1[i].startTime)
-                this.xAxisData.push(i);//jsonData1[i].startTime
+                this.xAxisData.push(jsonData1[i].startTime.slice(5,-3) + '~' +jsonData1[i].endTime.slice(5,-3));//jsonData1[i].startTime
                 this.moneyIn.push(jsonData2[i].revenue)
                 this.moneyOut.push(-jsonData1[i].expenditure)
                 this.money.push(this.moneyIn[i] + this.moneyOut[i])
                 this.moneyTotal += this.money[i]
+                this.moneyTotalIn += this.moneyIn[i]
+                this.moneyTotalOut += this.moneyOut[i]
                 if(jsonData1[i].expenditure > this.moneyMax)  this.moneyMax = jsonData1[i].expenditure
                 if(jsonData2[i].revenue > this.moneyMax)  this.moneyMax = jsonData2[i].revenue
             }
@@ -338,6 +383,12 @@ import '../../assets/css/charts.css'
         },
         updateChart() { 
             const newOption = {
+                title: {
+                    subtext: this.startTime + ' 至 ' + this.endTime + '\n' +
+                     '利润(元):' + this.moneyTotal +
+                      '  收入:' + this.moneyTotalIn +
+                       '  支出:' + this.moneyTotalOut,
+                },
                 xAxis: {
                     data: this.xAxisData,
                     name: this.unit,
@@ -374,10 +425,17 @@ import '../../assets/css/charts.css'
                 this.xAxisData.push('Dy' + i)
                 this.moneyIn.push(parseFloat((Math.random() * 2).toFixed(2)))
                 this.moneyOut.push(parseFloat(-Math.random().toFixed(2)))
-                this.money.push((this.moneyIn[i] + this.moneyOut[i]).toFixed(2))
+                this.money.push(this.moneyIn[i] + this.moneyOut[i])
+                this.moneyTotal += this.money[i]
+                this.money[i] = this.money[i].toFixed(2)
+                this.moneyTotalIn += this.moneyIn[i]
+                this.moneyTotalOut += this.moneyOut[i]
                 // console.log(this.moneyIn[i])
             }
             this.moneyMax = 6
+            this.moneyTotalOut = this.moneyTotalOut.toFixed(2)
+            this.moneyTotalIn = this.moneyTotalIn.toFixed(2)
+            this.moneyTotal = this.moneyTotal.toFixed(2)
         },
         cleanContainer() {
             // 1: arr.splice(0,arr.length)
