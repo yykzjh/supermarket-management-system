@@ -9,13 +9,51 @@
         <span>
           <el-button
             style="float: right; padding: 3px 0"
-            type="text">编辑
+            type="text">
+            <!-- 编辑 -->
           </el-button>
         </span>
       </div>
       <div style="width:100%; height: 300px; margin:-40px 0px -30px 0px" ref="pie_ref"></div>
-      <div style="background-color:red; height: 300px;">
-        
+      <div style="height: 300px;">
+        <el-form ref="form" :model="form" label-width="80px">
+          <el-form-item label="商品名称">
+            <span style="margin-left: 10px;">{{form.name}}</span>
+          </el-form-item>
+          <!-- <el-form-item label="摆放区域">
+            <el-select v-model="form.region" placeholder="请选择活动区域">
+              <el-option label="A1" value="A1"></el-option>
+              <el-option label="B2" value="B2"></el-option>
+            </el-select>
+          </el-form-item> -->
+          <!-- <el-form-item label="加入时间">
+            <el-col :span="11" v-model="form.date1">
+              <el-date-picker type="date" placeholder="选择日期" v-model="form.date1" style="width: 100%;"></el-date-picker>
+            </el-col>
+          </el-form-item> -->
+          <!-- <el-form-item label="即时配送">
+            <el-switch v-model="form.delivery"></el-switch>
+          </el-form-item> -->
+          <el-form-item label="商品类别">
+            <!-- <el-select v-model="form.type" placeholder="请选择活动区域">
+              <el-option label="文具" value="文具"></el-option>
+              <el-option label="日用品" value="日用品"></el-option>
+              <el-option label="饮料" value="饮料"></el-option>
+            </el-select> -->
+            <el-badge :value="form.parentId" class="item" type="primary">
+              <span style="margin-left: 10px;">{{form.type}}</span>
+            </el-badge>
+            
+          </el-form-item>
+          <el-form-item label="介绍">
+            <!-- <el-input type="textarea" v-model="form.intro"></el-input> -->
+            <span>{{form.intro}}</span>
+          </el-form-item>
+          <!-- <el-form-item>
+            <el-button type="primary" @click="onSubmit">立即创建</el-button>
+            <el-button>取消</el-button>
+          </el-form-item> -->
+        </el-form>
       </div>
     </el-card>
     <el-card
@@ -122,6 +160,16 @@
           [ '2018-06-01', 0.5 ],
           [ '2018-07-02', 0.5 ],
         ],// 售价变化数组
+        form: {
+          name: '超级大汉堡',
+          // region: 'A1',
+          // date1: '2020-01-01 08:00:00',
+          // delivery: false,
+          parentId: 2,
+          type: '速食',
+          // resource: '',// 供货商
+          intro: '为商品提供给市场，被人们使用和消费，并能满足人们某种需求的任何东西，包括有形的物品、无形的服务、组织、观念或它们的组合。'
+        }
       }
     },
     created () {
@@ -131,6 +179,7 @@
     mounted() {
       document.getElementById('spanTitle').innerText = this.goodid
       this.GetPieData()
+      this.GetGoodDetails()
       // this.GetLineData()
       this.InitCharts()
       window.addEventListener('resize', this.screenAdapter)
@@ -424,6 +473,19 @@
         if(msecs<10) secs = "0"+msecs
         // console.log(year+"/"+month+"/"+day+" "+hours+":"+mins+":"+secs)
         return  year+"/"+month+"/"+day+" "+hours+":"+mins+":"+secs
+      },
+      async GetGoodDetails() {
+        const {data: ret}  = await this.$http.get('/Goods/GoodDetail?good_id=' + this.goodid)
+        if(ret.StatusCode == 400) {
+          console.log('123456未查到该商品芜湖')
+        } else {
+          console.log(ret.good)
+          // console.log('这部分实际上也可以显示它的供应商等信息，点击跳转那种')
+
+          if(ret.good.name != null)  this.form.name = ret.good.name
+          if(ret.good.type != null)  this.form.type = ret.good.parentCat
+          if(ret.good.intro != null)  this.form.intro = ret.good.intro
+        }
       },
       async GetLineData() {
         if(this.startTime == '') {// 默认查三个月的

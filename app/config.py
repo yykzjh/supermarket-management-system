@@ -10,11 +10,7 @@ class Config1(object):
     SECRET_KEY = "fjhfdsfhdgsjdsjaffgaj"
 
     # sqlalchemy的配置参数
-<<<<<<< HEAD
-    SQLALCHEMY_DATABASE_URI = "mysql://root:sww533212@127.0.0.1:3306/supermarket"
-=======
     SQLALCHEMY_DATABASE_URI = "mysql://root:123456@127.0.0.1:3306/supermarket"
->>>>>>> ef30876c57a234966cc030f30838a23b02b0886a
     
     # 设置sqlalchemy自动跟踪数据库
     SQLALCHEMY_TRACK_MODIFICATIONS = True
@@ -30,4 +26,3 @@ class Config1(object):
 
 
 app.config.from_object(Config1)
-
