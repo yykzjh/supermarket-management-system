@@ -256,7 +256,7 @@ def faceLogin():
     if response:
         response = response.json()
         print(response)
-        user = response['user_list'][0]
+        user = response['result']['user_list'][0]
         if response['error_code'] == 0 and response['error_msg'] == 'SUCCESS':
             if user['score'] > 80:
                 token =base64.b64encode(os.urandom(24)).decode('utf-8')
