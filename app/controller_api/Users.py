@@ -203,7 +203,7 @@ def register():
         'group_id':'admin',
         'user_id':user_id,
         'user_info':user_password,
-        'quality_control':'HIGH',
+        'quality_control':'NORMAL',
         'liveness_control':'HIGH'
     }
     params = json.dumps(params)
@@ -238,7 +238,7 @@ def faceLogin():
     access_token = get_access_token("6TxFYc3iYRvqym28qullO4rI", "wh2im6M0fAzpa6PAdyspNLZehLculqxz")
     # 人脸搜索请求路由
     request_url = "https://aip.baidubce.com/rest/2.0/face/v3/search"
-    # 请求头
+    # 请求头faceLogin
     headers = {'content-type': 'application/json'}
     # 完整的请求路由
     complete_request_url = request_url + "?access_token=" + access_token

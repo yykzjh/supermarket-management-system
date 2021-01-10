@@ -13,10 +13,8 @@
             <el-button slot="append" icon="el-icon-search" @click="searchUser"></el-button>
           </el-input>
         </el-col>
-        <el-col :span="3">
+        <el-col :span="10">
           <el-button class="gutter" type="primary" @click="addUserSee = true">添加用户</el-button>
-        </el-col>
-        <el-col :span="3">
           <el-button class="gutter" type="primary" @click="downExcel" :loading="downloadLoading">下载表格</el-button>
         </el-col>
       </el-row>
@@ -128,11 +126,10 @@
       :visible.sync="changeRoleSee"
       width="50%">
       <div class="block">
-        <el-slider
-          v-model="changeRoleNum"
-          :step="1" :min="1" :max="3" :marks="marks"
-          show-stops>
-        </el-slider>
+        <el-rate
+          v-model="changeRoleNum" :texts="texts"
+          show-text :max="3">
+        </el-rate>
       </div>
       <span slot="footer" class="dialog-footer">
         <el-button @click="changeRoleSee = false">取消</el-button>
@@ -164,6 +161,7 @@
       }
       return {
         userList: [],
+        texts:['staff', 'admin', 'super'],
         downloadLoading: false,
         userName: '',
         editPassSee: false,
@@ -370,5 +368,11 @@
 <style scoped>
   .el-slider{
     padding: 50px 70px;
+  }
+  .el-rate__icon {
+    font-size: 50px;
+  }
+  .el-rate__text {
+    font-size: 20px;
   }
 </style>

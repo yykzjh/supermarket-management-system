@@ -1,80 +1,116 @@
-<!--单页面组件-->
 <template>
-  <div class="login_container">
-    <div class="login_box">
-      <!-- 头像区-->
-      <div class="avatar_box">
-        <img src="../assets/logo.png" alt="logo">
-      </div>
-      <!--登录表单区 v-model是双向绑定对象 :model是单向绑定对象-->
-      <el-form ref="registerFormRef" :model="registerForm" :rules="registerFormRules" label-width="0px" class="login_form">
-        <!--用户名-->
-        <el-form-item prop="username">
-          <el-input v-model="registerForm.username" prefix-icon="iconfont icon-user">
-          </el-input>
-        </el-form-item>
-        <!--密码-->
-        <el-form-item prop="password">
-          <el-input v-model="registerForm.password" prefix-icon="iconfont icon-3702mima" type="password"></el-input>
-        </el-form-item>
+  <div>
+    <el-alert
+      title="请填写必要信息及上传用户照片"
+      type="warning"
+      closable center style="width: 70%; margin: auto">
+    </el-alert>
+    <el-card style="margin: auto; width: 70%; margin-top: 15px">
+      <el-steps :space="300" :active="activeIndex - 0" finish-status="success" align-center>
+        <el-step title="基本信息"></el-step>
+        <el-step title="个人照片"></el-step>
+        <el-step title="完成"></el-step>
+      </el-steps>
+      <el-form :model="registerForm" :rules="registerFormRules" ref="registerFormRef"
+               label-position="top" label-width="100px">
+        <el-tabs v-model="activeIndex" :tab-position="'left'">
+          <el-tab-pane label="基本信息" name="0">
+            <el-form-item prop="username" label="工号">
+              <el-input v-model="registerForm.username"></el-input>
+            </el-form-item>
+            <el-form-item prop="name" label="姓名">
+              <el-input v-model="registerForm.name"></el-input>
+            </el-form-item>
+            <el-form-item prop="password" label="密码">
+              <el-input v-model="registerForm.password"></el-input>
+            </el-form-item>
+            <el-form-item prop="mobile" label="联系方式">
+              <el-input v-model="registerForm.mobile"></el-input>
+            </el-form-item>
+            <el-row>
+              <el-col :span="8"><div class="grid-content">
+                <el-form-item prop="gender" label="性别">
+                  <el-select v-model="registerForm.gender" placeholder="请选择">
+                    <el-option v-for="item in [{value: '男', label: '男'}, {value: '女', label: '女'}]"
+                               :key="item.value"
+                               :label="item.label"
+                               :value="item.value">
+                    </el-option>
+                  </el-select>
+                </el-form-item>
+              </div></el-col>
 
-        <el-form-item prop="password" >
-          <el-input v-model="repassword" prefix-icon="iconfont icon-3702mima" type="password" placeholder="请再次输入密码"></el-input>
-        </el-form-item>
+              <el-col :span="8"><div class="grid-content">
+                <el-form-item label="地区">
+                  <el-cascader
+                    v-model="registerForm.area"
+                    :options="citydata"
+                    :props="{ expandTrigger: 'hover',value:'value',label:'label',children:'children' }"
+                  ></el-cascader>
+                </el-form-item>
+              </div></el-col>
 
-        <div>
-          <div class="user-icon">
-            <video width="320" height="240" ref="videoDom" id="video" preload autoplay loop muted></video>
-            <canvas width="320" height="240" ref="canvasDOM"></canvas>
-          </div>
+              <el-col :span="8"><div class="grid-content">
+                <el-form-item label="生日" >
+                  <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" v-model="registerForm.birthday" type="date" placeholder="请选择日期" />
+                </el-form-item>
+              </div></el-col>
+            </el-row>
+          </el-tab-pane>
 
-          <div>{{loding}}</div>
-          <div class="button" @click="initTracker">人脸注册</div>
-        </div>
-        <!--按钮区-->
-        <el-form-item class="btns">
-          <el-button type="warning" @click="registerUser">注册</el-button>
-        </el-form-item>
+          <el-tab-pane label="个人照片" name="1">
+            <div class="user-icon">
+              <video width="320" height="240" ref="videoDom" id="video" preload autoplay loop muted></video>
+              <canvas width="320" height="240" ref="canvasDOM"></canvas>
+            </div>
+            <div>{{loding}}</div>
+            <el-button class="primary" @click="initTracker">开启摄像头</el-button>
+
+            <el-button type="success" @click="registerUser">开始注册</el-button>
+          </el-tab-pane>
+        </el-tabs>
       </el-form>
-    </div>
+    </el-card>
   </div>
 </template>
 
 <script>
+  import citydata from '../vender/citydata'
   require('tracking/build/tracking-min.js')
   require('tracking/build/data/face-min.js')
   export default {
     name: 'testTracking',
-    data () {
+    data() {
+      var checkMobile = (rule, value, callback) => {
+        var regMobile = /^1[0-9]{10}$/;
+        if (regMobile.test(value))
+          return callback()
+        else
+          return callback('请输入合法手机号')
+      }
       return {
-        // 登录表单的数据绑定对象
         registerForm: {
+          "name": '',
+          "face": '',
           "username": '',
           "password": '',
-          "name": '',
           "gender": '',
-          "birthday": "2020-11-11 00:00:00",
+          "birthday": '',
           "mobile": '',
-          "salary": 2000,
           "area": '',
-          "role_id": 2,
-          "face": ''
+          "role_id": 1,
+          "salary": 5000,
         },
-        repassword: '',
-        // 表单的验证规则对象
-        // 首先在表单外部声明rules 而后再将每一个规则赋给具体的元素，例如第一个输入文本框，给它赋值一个prop
+        citydata,
+        activeIndex: 0,
         registerFormRules: {
-          // 验证用户名是否合法
-          username: [
-            { required: true, message: '请输入注册用户名', trigger: 'blur' },
-          ],
-          // 验证密码是否合法
-          password: [
-            { required: true, message: '请输入注册密码', trigger: 'blur' },
-          ],
-          face: [
-            { required: true, message: '请输入登录密码', trigger: 'blur' },
-          ]
+          username: [{required: true, message: '请输入商品名称', trigger: 'blur'}],
+          name: [{required: true, message: '请输入商品名称', trigger: 'blur'}],
+          password: [{required: true, message: '请输入商品名称', trigger: 'blur'},
+            { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }],
+          mobile: [
+            { required: true, message: '请输入手机号', trigger: 'blur' },
+            { validator: checkMobile, trigger: 'blur' }]
         },
         count: 0,
         isdetected: '请您保持脸部在画面中央',
@@ -84,12 +120,11 @@
     methods: {
       async registerUser() {
         console.log(this.registerForm)
-        if(this.registerForm.password !== this.repassword)
-          this.$message.error('两次输入密码不一致，请重新输入')
-        // console.log(this.registerForm)
+        this.registerForm.area = this.registerForm.area.toString()
         const {data : res} = await this.$http.post('/Users/Register', this.registerForm)
         if(res.StatusCode === 200) {
           this.$message.success('注册成功')
+          this.$router.replace({path: '/login'})
         }
         else{
           this.$message.error(res.msg)
@@ -187,7 +222,7 @@
       postFace(){
         this.loding = '正在识别中,请稍后................'
         this.registerForm.face = this.imgbase64
-        console.log(this.imgbase64)
+        this.imgbase64 = ''
         this.loding = ''
       },
       // 视频流启动
@@ -209,69 +244,3 @@
     }
   }
 </script>
-
-<!--scoped表示当前样式只在当前模板内生效-->
-<style lang="less" scoped>
-  .login_container{
-    background-color: #2b4b6b;
-    height: 100%;
-  }
-  .login_box {
-    width: 450px;
-    height: 100%;
-    background-color: #fff;
-    border-radius: 3px;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-
-    .avatar_box {
-      height: 130px;
-      width: 130px;
-      border-radius: 50%;
-      padding: 10px;
-      box-shadow: 0 0 10px #ddd;
-      position: absolute;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background-color: #fff;
-      img {
-        height: 100%;
-        width: 100%;
-        border-radius: 50%;
-        background-color: #eee;
-      }
-    }
-  }
-  .login_form {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    padding: 0 20px;
-    box-sizing: border-box;
-  }
-  .btns {
-    display: flex;
-    justify-content: flex-end;
-  }
-  .user-icon {
-    margin-top: 20px;
-    width: 500px;
-    height: 500px;
-  }
-  .button {
-    width: 50px;
-    height: 50px;
-    line-height: 50px;
-    margin: 0 auto;
-    background-color: skyblue;
-    color: white;
-    text-align: center;
-    border-radius: 5px;
-    font-size: 16px;
-  }
-  video, canvas {
-    position: absolute;
-  }
-</style>

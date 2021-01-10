@@ -1,12 +1,21 @@
+<!--单页面组件-->
 <template>
-  <div>
-    <div class="user-icon">
-      <video width="320" height="240" ref="videoDom" id="video" preload autoplay loop muted></video>
-      <canvas width="320" height="240" ref="canvasDOM"></canvas>
+  <div class="login_container">
+    <div class="login_box">
+      <!-- 头像区-->
+      <div class="avatar_box">
+        <img src="../assets/logo.png" alt="logo">
+      </div>
+      <el-form label-width="0px" class="login_form">
+        <div>
+          <div class="user-icon">
+            <video width="320" height="240" ref="videoDom" id="video" preload autoplay loop muted></video>
+            <canvas width="320" height="240" ref="canvasDOM"></canvas>
+          </div>
+          <el-button @click="initTracker" style="margin: auto; display: flex; margin-bottom: 15px">人脸识别登录</el-button>
+        </div>
+      </el-form>
     </div>
-
-    <div>{{loding}}</div>
-    <div class="button" @click="initTracker">假设我是个按钮,点击之后我要人脸识别了</div>
   </div>
 </template>
 
@@ -124,13 +133,22 @@
         const {data: res} = await this.$http.post('/Users/FaceLogin',{
           "face": this.imgbase64
         })
-
-        this.loding = ''
-        if(res.StatusCode !== 200){
-          this.$message.error('失败')
-        }else {
-          this.$message.success('成功')
+        console.log(res)
+        if(res.StatusCode === 200){
+          this.$message.success('登陆成功')
+          window.sessionStorage.setItem('token', res.token);
+          window.sessionStorage.setItem('role_id', res.role_id);
+          this.$router.push('/home');
         }
+        else {
+          this.$message.error('登录失败' + res.msg)
+        }
+        // this.loding = ''
+        // if(res.StatusCode !== 200){
+        //   this.$message.error('失败')
+        // }else {
+        //   this.$message.success('成功')
+        // }
       },
       // 视频流启动
       getMediaStreamSuccess(stream) {
@@ -173,5 +191,47 @@
   }
   video, canvas {
     position: absolute;
+  }
+  .login_container{
+    background-color: #2b4b6b;
+    height: 100%;
+  }
+  .login_box {
+    width: 600px;
+    height: 550px;
+    background-color: #fff;
+    border-radius: 3px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .avatar_box {
+    height: 130px;
+    width: 130px;
+    border-radius: 50%;
+    padding: 10px;
+    box-shadow: 0 0 10px #ddd;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #fff;
+  }
+  img {
+    height: 100%;
+    width: 100%;
+    border-radius: 50%;
+    background-color: #eee;
+  }
+  .login_form {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+  .btns {
+    display: flex;
+    justify-content: flex-end;
   }
 </style>

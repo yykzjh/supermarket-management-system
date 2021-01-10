@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../components/Login'
+import LoginImg from '../components/LoginImg'
 import Register from '../components/Register'
 import Home from '../components/Home'
 import Welcome from '../components/Welcome'
@@ -20,8 +21,9 @@ Vue.use(VueRouter)
 
 const routes = [
   { path: '/', redirect: '/login' }, // 表示访问登录页面
-  { path: '/login', component: Login },
   { path: '/register', component: Register},
+  { path: '/login', component: Login },
+  { path: '/loginImg', component: LoginImg},
   { path: '/home', component: Home, redirect: '/welcome',
     children: [
       { path: '/welcome', component: Welcome },
@@ -46,7 +48,7 @@ const router = new VueRouter({
 router.beforeEach((to, from, next)=> {
   // to将要访问的路径 from从哪个路径跳转而来 next是一个函数表示放行
   // 1. 访问登录页，直接放行
-  if(to.path === '/login') return next();
+  if(to.path === '/login' || to.path === '/register' || to.path === '/loginImg') return next();
   // 2. 获取token
   const tokenStr = window.sessionStorage.getItem('token');
   // 3. 如果token不存在，跳转回login页面
