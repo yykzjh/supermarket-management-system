@@ -255,6 +255,7 @@ def faceLogin():
     response = requests.post(complete_request_url, data=params, headers=headers)
     if response:
         response = response.json()
+        print(response)
         user = response['user_list'][0]
         if response['error_code'] == 0 and response['error_msg'] == 'SUCCESS':
             if user['score'] > 80:
