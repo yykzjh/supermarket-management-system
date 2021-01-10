@@ -52,7 +52,7 @@ description: 返回指定商品的详细信息
 author: yykzjh
 Date: 2021-01-07 15:16:29
 param {商品id:int} good_id
-return JSON {StatusCode:200/400, good:Good}
+return JSON {StatusCode:200/400, good} good:{id, name, intro, icon, parentId, parentCat}
 '''
 @app_goods.route("/GoodDetail", methods=["GET"])
 def getGoodDetail():

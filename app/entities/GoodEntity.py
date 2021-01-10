@@ -74,7 +74,10 @@ def goodDetail(good_id):
         return None
     else:
         good = good.to_dict()
-        good['name'] = Category.query.get(good_id).name
+        theGoodInCat = Category.query.get(good_id)
+        good['name'] = theGoodInCat.name
+        good['parentId'] = theGoodInCat.parent
+        good['parentCat'] = Category.query.get(theGoodInCat.parent).name
         return good
 
 
