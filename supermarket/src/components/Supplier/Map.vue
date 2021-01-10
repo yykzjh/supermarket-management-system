@@ -1,4 +1,4 @@
-<!-- 
+<!--
   商家地理位置分布
  -->
 <template>
@@ -395,7 +395,7 @@ export default {
           { required: true, message: '请输入合约截止日期', trigger: 'blur'},
           { required: true, message: '请输入合约截止日期', trigger: 'change'}],
         address: [
-          { type: 'array', required: true, message: '请选择地址', trigger: 'change'}], 
+          { type: 'array', required: true, message: '请选择地址', trigger: 'change'}],
       },
       verifyCorrect: '',// 验证信息&弹出提示
 
@@ -548,7 +548,7 @@ export default {
     async getGlobalData() {
       // 基于前端vue环境 http://localhost:8080/static/map/China.json
       // Promise对象await解析 async
-      
+
       // jQuery ajax获取地图矢量数据 ../../assets/json/China.json
       // $.get('../../assets/json/China.json',function(ChinaJson){
       //   console.log(ChinaJson)
@@ -588,7 +588,7 @@ export default {
 
         this.citysTemp = this.timesData[province]
         this.UpdateCitysValue(ops, city)
-        
+
       } else if(op == 'delete') {
         ops = -1
         this.citysTemp = this.timesData['中国']
@@ -672,8 +672,8 @@ export default {
       const province = place[0]
       const city = place[1]
       // 检查填写数据是否合理
-      if(this.addSupplierForm.name=='' || 
-        this.addSupplierForm.sign_start=='' || 
+      if(this.addSupplierForm.name=='' ||
+        this.addSupplierForm.sign_start=='' ||
         this.addSupplierForm.end_start=='' ||
         (!(regMobile.test(this.addSupplierForm.mobile) || regTelephone.test(this.addSupplierForm.mobile))) ) {
         this.verifyCorrect = '信息填写不合理，请检查一波'

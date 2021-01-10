@@ -50,7 +50,7 @@
             <el-badge :value="form.parentId" class="item" type="primary">
               <span style="margin-left: 10px;">{{form.type}}</span>
             </el-badge>
-            
+
           </el-form-item>
           <el-form-item label="介绍">
             <!-- <el-input type="textarea" v-model="form.intro"></el-input> -->
@@ -107,7 +107,7 @@
               start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
               picker.$emit('pick', [start, end]);
             }
-          }, 
+          },
           {
             text: '最近一个月',
             onClick(picker) {
@@ -116,7 +116,7 @@
                 start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
                 picker.$emit('pick', [start, end]);
             }
-          }, 
+          },
           {
             text: '最近三个月',
             onClick(picker) {
@@ -170,6 +170,7 @@
         form: {
           id: 6,
           name: '超级大汉堡',
+          icon: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
           // region: 'A1',
           // date1: '2020-01-01 08:00:00',
           // delivery: false,
@@ -264,7 +265,7 @@
               z: -10,
               bounding: 'raw',
               style: {
-                image: 'https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png',
+                image: this.form.icon,
                 width: 150,
                 height: 150,
                 opacity: 1,
@@ -501,6 +502,9 @@
 
           if(ret.good.name != null)  this.form.name = ret.good.name
           if(ret.good.parentCat != null)  this.form.type = ret.good.parentCat
+          if(ret.good.icon !== null) {
+            //
+          }
           if(ret.good.intro != null)  this.form.intro = ret.good.intro
           if(ret.good.parentId != null)  this.form.parentId = ret.good.parentId
         }
@@ -550,7 +554,7 @@
           if(ret.status !== 200)
             this.$message.error('Network 获取售价变化失败')
           else {
-            
+
             if(len==0 && temp.length!=0) {
               this.priceMin = temp[0].price_in
               this.priceMax = temp[0].price_in
@@ -573,7 +577,7 @@
         }
         // 销量数组
       },
-      async GetPieData() { 
+      async GetPieData() {
         var ret  = await this.$http.get('/Stocks/amountOfTheCat?catId=' + this.goodid)
         // var ret = await this.$http.get('/Stocks/amountOfTheCat', {
         //   params: {catId: this.goodid}})
