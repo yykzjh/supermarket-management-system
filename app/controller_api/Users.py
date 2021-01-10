@@ -173,7 +173,7 @@ param {负责区域:str} area
 param {工资:float} salary
 param {角色id:int} role_id
 param {用户人脸图片:Base64} face
-return JSON {StatusCode:200/400, msg:"已有同账号的用户！"/respnse['error_msg']/"请求失败！"}
+return JSON {StatusCode:200/400, msg:"已有同账号的用户！"/response['error_msg']/"请求失败！"}
 '''
 @app_users.route("/Register", methods=["POST"])
 def register():
@@ -208,18 +208,18 @@ def register():
     }
     params = json.dumps(params)
     # 发送人脸注册请求
-    respnse = requests.post(complete_request_url, data=params, headers=headers)
+    response = requests.post(complete_request_url, data=params, headers=headers)
     # 返回信息处理
-    if respnse:
-        respnse = respnse.json()
-        if respnse['error_code'] == 0 and respnse['error_msg'] == 'SUCCESS':
+    if response:
+        response = response.json()
+        if response['error_code'] == 0 and response['error_msg'] == 'SUCCESS':
             if addUser(user_id, user_password, name=name, gender=gender, birthday=birthday, mobile=mobile,
                 area=area, salary=salary, role_id=role_id):
                 return jsonify(StatusCode=200)
             else:
                 return jsonify(StatusCode=400, msg="已有同账号的用户！")
         else:
-            return jsonify(StatusCode=400, msg=respnse['error_msg'])
+            return jsonify(StatusCode=400, msg=response['error_msg'])
     return jsonify(StatusCode=400, msg="请求失败！")
 
 
@@ -228,7 +228,7 @@ description: 人脸识别登录
 author: yykzjh
 Date: 2021-01-10 12:10:35
 param {人脸:Base64} face
-return {StatusCode:200/400, token, role_id, msg:"没有找到匹配的用户！"/respnse['error_msg']/"请求失败！"}
+return {StatusCode:200/400, token, role_id, msg:"没有找到匹配的用户！"/response['error_msg']/"请求失败！"}
 '''
 @app_users.route("/FaceLogin", methods=["POST"])
 def faceLogin():
@@ -256,11 +256,11 @@ def faceLogin():
     if response:
         response = response.json()
         user = response['user_list'][0]
-        if response['error_code'] == 0 and respnse['error_msg'] == 'SUCCESS':
+        if response['error_code'] == 0 and response['error_msg'] == 'SUCCESS':
             if user['score'] > 80:
                 token =base64.b64encode(os.urandom(24)).decode('utf-8')
                 session["token"] = token
-                user = select(response['user_list'][0]['user_id'],response['user_list'][0]['user_info'])
+                user = select(user['user_id'], user['user_info'])
                 if user != None:
                     return jsonify(StatusCode=200, token=token, role_id=user.get('role_id'))
             return jsonify(StatusCode=400, msg="没有找到匹配的用户！")
