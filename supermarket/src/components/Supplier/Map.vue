@@ -13,8 +13,14 @@
             切换<i class="el-icon-caret-bottom el-icon--right"></i>
         </span>
         <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item class="clearfix" @click.native="ChangeCondition(false)">供应商分布</el-dropdown-item>
-            <el-dropdown-item class="clearfix" @click.native="ChangeCondition(true)">按供货筛选</el-dropdown-item>
+            <el-dropdown-item
+              class="clearfix"
+              @click.native="ChangeCondition(false)">供应商分布
+            </el-dropdown-item>
+            <el-dropdown-item
+              class="clearfix"
+              @click.native="ChangeCondition(true)">按供货筛选
+            </el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
       <el-button icon="el-icon-plus" circle @click="ChangeAddState(true)"></el-button>
@@ -27,8 +33,15 @@
         <!--按钮区域-->
         <el-row :gutter="20">
           <el-col :span="10">
-            <el-input placeholder="请输入名称或电话或商品编号" v-model="inputCondition" clearable>
-              <el-button slot="append" icon="el-icon-search" @click="ScreenSupplier"></el-button>
+            <el-input
+              placeholder="请输入名称或电话关键字查询"
+              v-model="inputCondition"
+              clearable>
+              <el-button
+                slot="append"
+                icon="el-icon-search"
+                @click="ScreenSupplier">
+              </el-button>
             </el-input>
           </el-col>
 
@@ -36,12 +49,19 @@
             <!-- <el-button class="gutter" type="primary" @click="addUserSee = true">添加供应商</el-button> -->
           <!-- </el-col> -->
           <el-col :span="3">
-            <el-button icon="el-icon-download" circle @click="downExcel" :loading="downloadLoading"></el-button>
+            <el-button
+              icon="el-icon-download"
+              circle
+              @click="downExcel"
+              :loading="downloadLoading">
+            </el-button>
             <!-- <el-button class="gutter" type="primary" @click="downExcel" :loading="downloadLoading">下载表格</el-button> -->
           </el-col>
         </el-row>
         <!--供应商列表-->
-        <el-table :data="supplierList.slice((pageNum-1)*pageSize, pageNum*pageSize)" stripe>
+        <el-table
+          :data="supplierList.slice((pageNum-1)*pageSize, pageNum*pageSize)"
+          stripe>
           <el-table-column type="index"></el-table-column>
           <el-table-column label="名称" prop="name">
             <template slot-scope="scope">
@@ -55,7 +75,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="电话" prop="mobile">
+          <el-table-column label="联系方式" prop="mobile">
             <template slot-scope="scope">
               <el-input
                 v-show="scope.row.isEdit"
@@ -69,16 +89,17 @@
           </el-table-column>
           <el-table-column label="地区" prop="area">
             <template slot-scope="scope">
+              <span>
+                <!-- v-show="!scope.row.isEdit" -->
+                <!-- 不隐藏当参考 -->
+                {{scope.row.area}}
+              </span>
               <el-cascader class="width"
                 v-show="scope.row.isEdit"
                 v-model="scope.row.area"
                 :options="cityData"
                 :props="{ expandTrigger: 'hover',value:'value',label:'label',children:'children' }">
               </el-cascader>
-              <span
-                v-show="!scope.row.isEdit">
-                {{scope.row.area}}
-              </span>
             </template>
           </el-table-column>
           <el-table-column label="合作起始日期" prop="sign_start">
@@ -129,8 +150,15 @@
         </el-pagination>
       </el-card>
     </div>
-    <el-dialog title="新增供货商" :visible.sync="addSupplierSee" width="50%" @close="ChangeAddState(false)">
-      <el-form :model="addSupplierForm" :rules="editSupplierRules" :label-width="formLabelWidth">
+    <el-dialog
+      title="新增供货商"
+      :visible.sync="addSupplierSee"
+      width="50%"
+      @close="ChangeAddState(false)">
+      <el-form
+        :model="addSupplierForm"
+        :rules="editSupplierRules"
+        :label-width="formLabelWidth">
         <el-form-item label="供货商名称" prop="name">
           <el-input v-model="addSupplierForm.name" autocomplete="off" clearable></el-input>
         </el-form-item>
@@ -139,14 +167,29 @@
         </el-form-item>
         <el-form-item label="合约起始日期" prop="sign_start">
           <!-- style="float:left" -->
-          <el-date-picker value-format="yyyy-MM-dd" v-model="addSupplierForm.sign_start" type="date" placeholder="请选择日期"/>
+          <el-date-picker
+            value-format="yyyy-MM-dd"
+            v-model="addSupplierForm.sign_start"
+            type="date"
+            placeholder="请选择日期"/>
           <!-- style="width:180px;" -->
         </el-form-item>
         <el-form-item label="合约截止日期" prop="sign_end">
-          <el-date-picker value-format="yyyy-MM-dd" v-model="addSupplierForm.sign_end" type="date" placeholder="请选择日期"/>
+          <el-date-picker
+            value-format="yyyy-MM-dd"
+            v-model="addSupplierForm.sign_end"
+            type="date"
+            placeholder="请选择日期"/>
         </el-form-item>
         <el-form-item label="供应商地址" prop="address">
-          <el-cascader class="width" placeholder="北京市 / 朝阳区" v-model="addSupplierForm.address" :options="cityData" :props="{ expandTrigger: 'hover',value:'value',label:'label',children:'children' }" clearable></el-cascader>
+          <el-cascader
+            class="width"
+            placeholder="北京市 / 朝阳区"
+            v-model="addSupplierForm.address"
+            :options="cityData"
+            :props="{ expandTrigger: 'hover',value:'value',label:'label',children:'children' }"
+            clearable>
+          </el-cascader>
         </el-form-item>
       </el-form>
 
@@ -176,23 +219,94 @@
       :visible.sync="drawer"
       size="50%">
       <el-table
-        :data="regionSupplierList"
-        stripe
-        style="margin-top:-15px;">
-        <el-table-column type="index"></el-table-column>
-        <el-table-column label="名称" prop="name"></el-table-column>
-        <el-table-column label="电话" prop="mobile"></el-table-column>
-        <el-table-column label="地区" prop="area"></el-table-column>
-        <el-table-column label="合作起始日期" prop="sign_start"></el-table-column>
-        <el-table-column label="截止日期" prop="sign_end"></el-table-column>
-        <!-- <el-table-column label="供应项目" prop="provide"></el-table-column> -->
-        <el-table-column label="可执行操作">
-          <template slot-scope="scope">
-            <el-button type="primary" icon="el-icon-edit" circle size="mini" @click="ShowEditDialog(scope.row)"></el-button>
-            <el-button type="danger" icon="el-icon-delete" circle size="mini" @click="DeleteSupplier(scope.row.id)"></el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+        :data="regionSupplierList.slice((pageNum-1)*pageSize, pageNum*pageSize)"
+        stripe>
+          <el-table-column type="index"></el-table-column>
+          <el-table-column label="名称" prop="name">
+            <template slot-scope="scope">
+              <el-input
+                v-show="scope.row.isEdit"
+                v-model="scope.row.name">
+              </el-input>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.name}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="联系方式" prop="mobile">
+            <template slot-scope="scope">
+              <el-input
+                v-show="scope.row.isEdit"
+                v-model="scope.row.mobile">
+              </el-input>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.mobile}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="地区" prop="area">
+            <template slot-scope="scope">
+              <span>
+                <!-- v-show="!scope.row.isEdit" -->
+                <!-- 不隐藏当参考 -->
+                {{scope.row.area}}
+              </span>
+              <el-cascader class="width"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.area"
+                :options="cityData"
+                :props="{ expandTrigger: 'hover',value:'value',label:'label',children:'children' }">
+              </el-cascader>
+            </template>
+          </el-table-column>
+          <el-table-column label="合作起始日期" prop="sign_start">
+            <template slot-scope="scope">
+              <el-date-picker
+                value-format="yyyy-MM-dd"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.sign_start"
+                type="date"/>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.sign_start}}
+              </span>
+            </template>
+          </el-table-column>
+          <el-table-column label="截止日期" prop="sign_end">
+            <template slot-scope="scope">
+              <el-date-picker
+                value-format="yyyy-MM-dd"
+                v-show="scope.row.isEdit"
+                v-model="scope.row.sign_end"
+                type="date"/>
+              <span
+                v-show="!scope.row.isEdit">
+                {{scope.row.sign_end}}
+              </span>
+            </template>
+          </el-table-column>
+          <!-- <el-table-column label="供应项目" prop="provide"></el-table-column> -->
+          <el-table-column label="可执行操作">
+            <template slot-scope="scope">
+              <el-button type="close" icon="el-icon-close" size="mini" @click="CancleEdit(scope.row)" v-show="scope.row.isEdit"></el-button>
+              <el-button type="success" icon="el-icon-check" size="mini" @click="SaveChange(scope.row)" v-show="scope.row.isEdit"></el-button>
+              <el-button type="primary" icon="el-icon-edit" size="mini" @click="ShowEditDialog(scope.row)" v-show="!scope.row.isEdit"></el-button>
+              <!-- <el-button disabled type="primary" icon="el-icon-edit" size="mini" @click="ShowEditDialog(scope.row)" v-show="!scope.row.isEdit"></el-button> -->
+              <el-button type="danger" icon="el-icon-delete" size="mini" @click="DeleteSupplier(scope.row.id)" v-show="!scope.row.isEdit"></el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+          :current-page="pageNum"
+          :page-sizes="[1, 2, 5, 10]"
+          :page-size="pageSize"
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="pageTotal">
+        </el-pagination>
     </el-drawer>
   </div>
 </template>
@@ -293,7 +407,9 @@ export default {
       pageNum: 1,
       pageTotal: 0,
       downloadLoading: false,
-      initUpdateVal: ''
+      initUpdateVal: '',
+      nowEdit: -1,
+      editTemp: null
     }
   },
   mounted() {
@@ -507,14 +623,16 @@ export default {
       this.chartInstance.setOption(adaptOption)
       this.chartInstance.resize()
     },
-    SuppliersDrawer(cityName) {
+    async SuppliersDrawer(cityName) {
       // console.log(cityName)
-      if ( !this.suplliersIncity[cityName]) {
-        console.log('nothing')
-        // 根据城市名 请求该城市下所有供应商信息
-
+      // console.log(this.nowPlace, cityName)
+      var ret = await this.$http.get('/Suppliers/SearchByPosition?province=' + this.nowPlace+"&city="+cityName)
+      console.log(ret)
+      if(ret.status != 200) console.log('Network 获取该城市供应商列表失败')
+      else {
+        var listTemp = ret.data.suppliers
+        this.ListTemp2SuppliersList(listTemp, 2)
       }
-      this.regionSupplierList = this.suplliersIncity[cityName]
       this.drawer = true
       this.drawerTitle = cityName
     },
@@ -602,6 +720,20 @@ export default {
         this.InitSupplier()
       }
     },
+    ListTemp2SuppliersList(listTemp, level) {
+      this.pageTotal = listTemp.length
+      var time
+      for (var i in listTemp) {
+        time = new Date(listTemp[i]['sign_start'])
+        listTemp[i]['sign_start'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+        time = new Date(listTemp[i]['sign_end'])
+        listTemp[i]['sign_end'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
+        listTemp[i]['area'] = listTemp[i]['province'] + listTemp[i]['city']
+        listTemp[i]['isEdit'] = false
+      }
+      if(level == 1) this.supplierList = listTemp
+      else if(level == 2) this.regionSupplierList = listTemp
+    },
     async AllSupplier() {
       var ret = await this.$http.get('/Suppliers/SuppliersInfo')
       // this.supplierList = [
@@ -625,17 +757,7 @@ export default {
       // ]
       // console.log(this.supplierList)
       var listTemp = ret.data.suppliers
-      this.pageTotal = listTemp.length
-      var time
-      for (var i in listTemp) {
-        time = new Date(listTemp[i]['sign_start'])
-        listTemp[i]['sign_start'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
-        time = new Date(listTemp[i]['sign_end'])
-        listTemp[i]['sign_end'] = time.getFullYear()+'-'+(time.getMonth()+1<10?'0'+(time.getMonth()+1):(time.getMonth()+1))+'-'+(time.getDate()<10?'0'+time.getDate():time.getDate())
-        listTemp[i]['area'] = listTemp[i]['province'] + listTemp[i]['city']
-        listTemp[i]['isEdit'] = false
-      }
-      this.supplierList = listTemp
+      this.ListTemp2SuppliersList(listTemp, 1)
       // this.supplierList = ret.data.suppliers
       // this.pageTotal = this.supplierList.length
       // var time
@@ -650,26 +772,23 @@ export default {
       // console.log(this.supplierList)
     },
     async ScreenSupplier() {// 根据输入的条件筛选供应商
-      // var ret = await this.$http.get('/Suppliers/GetSuppliers', {
-      //   params: {
-      //     condition: this.inputCondition
-      //   }
-      // })
-      // this.supplierList = ret.supplier
-      // console.log(this.supplierList)
+    if(this.inputCondition=='') return
+      var ret = await this.$http.get('/Suppliers/SeachByNameOrMobile?text=' + this.inputCondition)
+      var listTemp = ret.data.suppliers
+      this.ListTemp2SuppliersList(listTemp, 1)
+      console.log(this.supplierList)
     },
     async SaveChange(row) {// line-110
       // console.log(typeof(row.area),row.area)
       var province = null
       var city = null
+      // console.log(typeof(row.area),row.area)// object用户选了 string没变过
       if(typeof(row.area) != "string") {// 重新设定地址object
         province = row.area[0]
         city = row.area[1]
         row.area = province + city
       }
-      this.ShowEditDialog(row)
       // 保存修改上传
-      console.log('改',row.id)
       const ret = await this.$confirm('此操作将修改该供货商信息, 是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -679,31 +798,39 @@ export default {
       })
 
       if (ret !== 'confirm') {
-        return this.$message.info('取消修改')
         this.CancleEdit(row)
+        return this.$message.info('取消修改')
       }
       else {
         const { data: mess } = await this.$http.post('Suppliers/ModifySupplier',{
-          params: {
-            id: row.id,
-            name: row.name,
-            mobile: row.mobile,
-            province: province,
-            city: city,
-            sign_start: row.sign_start,
-            sign_end: row.sign_end
-          }
+          'id': row.id,
+          'name': row.name,
+          'mobile': row.mobile,
+          'province': province,
+          'city': city,
+          'sign_start': row.sign_start,
+          'sign_end': row.sign_end
         })
         if (mess.StatusCode !== 200) return this.$message.error(mess.msg)
         else {
-          // if(this.DeteleSupplierFromList(id)) this.$message.success('修改供货商信息成功')
+          // console.log(mess)
+          // 更新row 重新渲染
+          row.isEdit = false
+          this.nowEdit = -1
+          this.$message.success('修改供货商信息成功')
         }
       }
     },
     CancleEdit(row) {
-      console.log(row.id)
+      // console.log(row.id)
+      if(this.editTemp.id != row.id)
+        console.log('Bug正在编辑行副本和当前行id不一致')
       // 取消不修改供应商信息
-      this.ShowEditDialog(row)
+      // this.ShowEditDialog(row)
+      // 根据副本恢复修改前信息
+      Object.assign(row,this.editTemp)
+      this.nowEdit = -1//当前没有正在编辑行
+      row.isEdit = false
       // ****************************************************筛选的话 id怎么排?
       // for (var i in this.supplierList) {
       //   console.log(this.supplierList[i]['id'], this.supplierList[i]['id'] == row.id)
@@ -719,12 +846,18 @@ export default {
     },
     ShowEditDialog(row) {
       console.log('Show',row.id)
-      // alert(row.isEdit)
-      // this.initUpdateVal = row.id
-      row.isEdit = !row.isEdit
-      
-      // console.log()
-      // alert(row.isEdit)
+      if(this.nowEdit >=0 ) {
+        alert('有正在编辑的条目')
+        return
+      }
+      // 以防cancel修改 来个副本
+      this.editTemp = {}
+      Object.assign(this.editTemp,row)
+
+      // console.log(row)
+      // console.log(this.editTemp)
+      this.nowEdit = row.id
+      row.isEdit = true
     },
     DeteleSupplierFromList(id) {
       for (var i in this.supplierList) {
@@ -773,27 +906,29 @@ export default {
     // table筛选
     downExcel () {
       this.downloadLoading = true
-      // import("../../vender/Export2Excel").then(excel => {
-      //   const tHeader = [
-      //     "姓名", "性别", "电话", "地区", "角色"
-      //   ]
-      //   const filterVal = [
-      //     "name", "gender", "mobile", "area", "role_id"
-      //   ]
-      //   const data = this.formatJson(filterVal)
-      //   excel.export_json_to_excel({
-      //     header: tHeader,
-      //     data,
-      //     filename: "员工信息表"
-      //   })
+      import("../../vender/Export2Excel").then(excel => {
+        const tHeader = [
+          "名称", "联系方式", "省", "市", "合作起始日期", "截止日期"
+        ]
+        const filterVal = [
+          "name", "mobile", "province", "city", "sign_start", "sign_end"
+        ]
+        const data = this.formatJson(filterVal)
+        excel.export_json_to_excel({
+          header: tHeader,
+          data,
+          filename: "供应商信息表"
+        })
         this.downloadLoading = false
-      // })
+      })
     },
-    // formatJson(filterVal) {
-    //   return this.supplierList.map(v =>
-    //     filterVal.map(j => v[j])
-    //   )
-    // },
+    formatJson(filterVal) {
+      return this.supplierList.map(v =>
+        filterVal.map(j => {
+          return v[j];
+        })
+      )
+    },
   }
 }
 </script>

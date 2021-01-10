@@ -163,7 +163,7 @@ CREATE TABLE `sms_roles` (
   `name` varchar(32) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `name` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -172,6 +172,7 @@ CREATE TABLE `sms_roles` (
 
 LOCK TABLES `sms_roles` WRITE;
 /*!40000 ALTER TABLE `sms_roles` DISABLE KEYS */;
+INSERT INTO `sms_roles` VALUES (2,'admin'),(1,'staff'),(3,'superadmin');
 /*!40000 ALTER TABLE `sms_roles` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -299,4 +300,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-01-10 14:20:49
+-- Dump completed on 2021-01-10 14:36:13

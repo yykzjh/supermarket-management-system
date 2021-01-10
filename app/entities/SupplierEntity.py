@@ -4,7 +4,7 @@ Date: 2021-01-04 09:05:59
 Description: 供货商实体的方法接口
 '''
 
-from sqlalchemy import (or_, func)
+from sqlalchemy import (or_, func, and_)
 from app.models import db, Supplier, to_json
 
 
@@ -88,4 +88,13 @@ def divideCity(province):
         suppliersList.append(tempItem)
     
     return suppliersList
-    
+
+
+def fuzzySearch(text):
+    suppliers = Supplier.query.filter(or_(Supplier.name.like('%'+text+'%'), Supplier.mobile.like('%'+text+'%'))).all()
+    return to_json(suppliers)
+
+
+def searchByPosition(province, city):
+    suppliers = Supplier.query.filter(and_(Supplier.province.like('%'+province+'%'), Supplier.city.like('%'+city+'%'))).all()
+    return to_json(suppliers)
