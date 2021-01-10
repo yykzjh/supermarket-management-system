@@ -175,7 +175,7 @@ param {角色id:int} role_id
 param {用户人脸图片:Base64} face
 return JSON {StatusCode:200/400, msg:"已有同账号的用户！"/respnse['error_msg']/"请求失败！"}
 '''
-@app_users.route("Register", methods=["POST"])
+@app_users.route("/Register", methods=["POST"])
 def register():
     newUser = request.get_json()
     user_id = newUser.get('username')
@@ -252,20 +252,20 @@ def faceLogin():
     }
     params = json.dumps(params)
     # 发送人脸搜索请求
-    respnse = requests.post(complete_request_url, data=params, headers=headers)
+    response = requests.post(complete_request_url, data=params, headers=headers)
     if response:
         response = response.json()
         user = response['user_list'][0]
-        if respnse['error_code'] == 0 and respnse['error_msg'] == 'SUCCESS':
+        if response['error_code'] == 0 and respnse['error_msg'] == 'SUCCESS':
             if user['score'] > 80:
                 token =base64.b64encode(os.urandom(24)).decode('utf-8')
                 session["token"] = token
-                user = select(user_id, user_pwd)
+                user = select(response['user_list'][0]['user_id'],response['user_list'][0]['user_info'])
                 if user != None:
                     return jsonify(StatusCode=200, token=token, role_id=user.get('role_id'))
             return jsonify(StatusCode=400, msg="没有找到匹配的用户！")
         else:
-            return jsonify(StatusCode=400, msg=respnse['error_msg'])
+            return jsonify(StatusCode=400, msg=response['error_msg'])
     else:
         return jsonify(StatusCode=400, msg="请求失败！")
     
