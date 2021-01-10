@@ -20,6 +20,7 @@
         <!--按钮区-->
         <el-form-item class="btns">
           <el-button type="primary" @click="login">登录</el-button>
+          <el-button type="warning" @click="registerUser">注册</el-button>
           <el-button type="info" @click="resetLoginForm">重置</el-button>
         </el-form-item>
       </el-form>
@@ -87,6 +88,11 @@
           // 2 通过编程式导航跳转到后台主页，路由地址是 /home
 
         })
+      },
+      // 跳转到用户注册组件
+      registerUser(){
+        window.sessionStorage.setItem('token', 'runtimefor1234567');
+        this.$router.push('/register')
       }
     }
   }

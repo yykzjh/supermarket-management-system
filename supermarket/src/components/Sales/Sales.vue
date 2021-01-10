@@ -14,7 +14,7 @@
       <el-col :span="12" style="margin-left: 15px">
         <el-card class="grid-content">
           <el-table
-            border height="400px" :data="scollPrice">
+            border height="400px" :data="scollPrice" stripe>
             <el-table-column prop="time" label="订单生成时间"></el-table-column>
             <el-table-column prop="total" label="订单总额"></el-table-column>
           </el-table>
@@ -160,7 +160,7 @@ export default {
     },
     // 播放销售订单
     play() {
-      setInterval(this.change, 2000);//每两秒执行一次插入删除操作
+      setInterval(this.change, 1000);//每两秒执行一次插入删除操作
     },
     spanMethod({ row, column, rowIndex, columnIndex }){
       if(columnIndex === 0) {

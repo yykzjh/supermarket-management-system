@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Login from '../components/Login'
+import Register from '../components/Register'
 import Home from '../components/Home'
 import Welcome from '../components/Welcome'
 import Superinfo from '../components/Staff/Superinfo'
@@ -20,6 +21,7 @@ Vue.use(VueRouter)
 const routes = [
   { path: '/', redirect: '/login' }, // 表示访问登录页面
   { path: '/login', component: Login },
+  { path: '/register', component: Register},
   { path: '/home', component: Home, redirect: '/welcome',
     children: [
       { path: '/welcome', component: Welcome },

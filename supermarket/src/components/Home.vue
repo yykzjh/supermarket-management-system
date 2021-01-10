@@ -2,7 +2,7 @@
   <el-container class="home-container">
     <!--头部区域-->
     <!-- <el-header >
-      
+
     </el-header> -->
     <!--页面主题区域-->
     <el-container>
@@ -15,6 +15,17 @@
           :collapse="isCollapse" :collapse-transition="false"
           :router="true" :default-active="activePath"
         >
+          <el-menu-item>
+            <span style="font-family: 'Hiragino Sans GB'; font-size: large; font-weight:bold;">Supermarket</span>
+          </el-menu-item>
+
+          <el-menu-item>
+            <div>
+              <img src="../assets/avater.gif" alt="avater" class="imgg2">
+              <el-button style="margin-left: 20px" type="info" @click="logout" size="mini">退出</el-button>
+            </div>
+          </el-menu-item>
+
           <el-submenu index="1">
             <template slot="title">
               <i :class="menuList[0].icon"></i>
@@ -49,16 +60,7 @@
             <span slot="title">{{item.name}}</span>
           </el-menu-item>
 
-          <el-menu-item>
-            <div>
-              <img src="../assets/market.jpeg" alt="logo" class="imgg1">
-              <span>超市管理系统</span>
-            </div>
-            <div>
-              <img src="../assets/avater.gif" alt="avater" class="imgg2">
-              <el-button type="info" @click="logout">退出</el-button>
-            </div>
-          </el-menu-item>
+
 
         </el-menu>
 
@@ -128,8 +130,8 @@ export default {
      border-radius: 50%;
    }
    .imgg2 {
-     height: 40px;
-     width: 40px;
+     height: 30px;
+     width: 30px;
      margin-right: 10px;
    }
   .el-header {
