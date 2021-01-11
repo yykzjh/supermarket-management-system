@@ -5,7 +5,7 @@
       <el-breadcrumb-item>订单管理</el-breadcrumb-item>
       <el-breadcrumb-item>销售订单管理</el-breadcrumb-item>
     </el-breadcrumb>
-    <el-row>
+    <el-row >
       <el-col :span="11">
         <el-card class="grid-content">
           <div id="newEcharts" class="grid-content" style="width:500px;height:400px;padding-top:40px"></div>
@@ -14,7 +14,7 @@
       <el-col :span="12" style="margin-left: 15px">
         <el-card class="grid-content">
           <el-table
-            border height="400px" :data="scollPrice" stripe>
+            border height="423px" :data="scollPrice" stripe>
             <el-table-column prop="time" label="订单生成时间"></el-table-column>
             <el-table-column prop="total" label="订单总额"></el-table-column>
           </el-table>
@@ -24,12 +24,22 @@
 
 
     <el-card style="margin-top: 25px">
-      <el-table :data="ordersList" :span-method="spanMethod" border stripe style="width: 100%">
+      <el-table :data="ordersList.slice((pagenum-1)*pagesize, pagenum*pagesize)" :span-method="spanMethod" border stripe style="width: 100%">
         <el-table-column prop="datetime" label="时间"></el-table-column>
         <el-table-column prop="good_name" label="名称"></el-table-column>
         <el-table-column prop="price" label="价格"></el-table-column>
         <el-table-column prop="amount" label="数量"></el-table-column>
       </el-table>
+
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pagenum"
+        :page-sizes="[2, 5, 10, 20]"
+        :page-size="pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
     </el-card>
   </div>
 
@@ -46,8 +56,11 @@ export default {
       tableIndex: 0, // table的下标
       UnitIndex: 0, // rowUnit的下标
       scollPrice: [],
+      pagesize: 5,
+      pagenum: 1,
       dataset: { source: [
         ]},
+      total: 0,
     }
   },
   created () {
@@ -72,7 +85,7 @@ export default {
           },
           tooltip: {
             trigger: 'axis',//触发类型，'axis'为坐标系触发
-            showContent: false//是否显示提示框浮层
+            // showContent: false//是否显示提示框浮层
           },
           dataset: that.dataset,
           xAxis: {type: 'category'},
@@ -128,6 +141,13 @@ export default {
         myChart.setOption(option);
       });
     },
+    handleSizeChange(newSize) {
+      this.pagesize = newSize;
+    },
+    // 分页的页面变化
+    handleCurrentChange(newCurr){
+      this.pagenum = newCurr
+    },
     async getOrdersList() {
       const {data: res} = await this.$http.get('/HistoryOrders/AllHistoryOrders')
       if(res === {})
@@ -158,6 +178,7 @@ export default {
           let tempObj2 = {time: res.orders[key].datetime.split(" ")[0], total: totalMoney}
           that.scollPrice.push(tempObj2)
         });
+        this.total = that.ordersList.length
         // console.log(that.ordersList)
         // console.log(that.scollPrice)
         console.log(that.rowUnit)
@@ -165,7 +186,7 @@ export default {
     },
     // 播放销售订单
     play() {
-      setInterval(this.change, 1000);//每两秒执行一次插入删除操作
+      setInterval(this.change, 2000);//每两秒执行一次插入删除操作
     },
     spanMethod({ row, column, rowIndex, columnIndex }){
       if(columnIndex === 0) {

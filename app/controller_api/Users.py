@@ -204,7 +204,7 @@ def register():
         'user_id':user_id,
         'user_info':user_password,
         'quality_control':'NORMAL',
-        'liveness_control':'HIGH'
+        'liveness_control':'NORMAL'
     }
     params = json.dumps(params)
     # 发送人脸注册请求

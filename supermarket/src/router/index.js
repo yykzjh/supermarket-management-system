@@ -6,7 +6,7 @@ import Register from '../components/Register'
 import Home from '../components/Home'
 import Welcome from '../components/Welcome'
 import Superinfo from '../components/Staff/Superinfo'
-import Supplier from '../components/Supplier/Supplier'
+// import Supplier from '../components/Supplier/Supplier'
 import Category from '../components/Goods/Category'
 import GoodInfo from '../components/Goods/GoodInfo'
 import Purchase from '../components/Purchase/Purchase'
@@ -15,7 +15,7 @@ import Statistic from '../components/Statistic/Statistic'
 import Admininfo from '../components/Staff/Admininfo'
 import AddGood from '../components/Goods/AddGood'
 
-// import SupplierMap from '../components/Supplier/Map'
+import SupplierMap from '../components/Supplier/Map'
 
 Vue.use(VueRouter)
 
@@ -29,8 +29,8 @@ const routes = [
       { path: '/welcome', component: Welcome },
       { path: '/superinfo', component: Superinfo },
       { path: '/admininfo', component: Admininfo },
-      { path: '/supplier', component: Supplier },
-      //{ path: '/supplier', component: SupplierMap },
+      // { path: '/supplier', component: Supplier },
+      { path: '/supplier', component: SupplierMap },
       { path: '/category', component: Category },
       { path: '/addgood', component: AddGood},
       { path: '/goodInfo', component: GoodInfo},

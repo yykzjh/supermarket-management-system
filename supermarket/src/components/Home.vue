@@ -33,13 +33,13 @@
             </template>
             <el-menu-item-group>
               <template slot="title"></template>
-              <el-menu-item :index="menuList[0].children[0].path">
+              <el-menu-item :index="menuList[0].children[0].path" :disabled="roleSee">
                 <template slot="title">
                   <i class="el-icon-menu"></i>
                   <span>{{menuList[0].children[0].name}}</span>
                 </template>
               </el-menu-item>
-              <el-menu-item :index="menuList[0].children[1].path" :disabled="roleSee">
+              <el-menu-item :index="menuList[0].children[1].path">
                 <template slot="title">
                   <i class="el-icon-menu"></i>
                   <span>{{menuList[0].children[1].name}}</span>
@@ -114,6 +114,8 @@ export default {
       var id = window.sessionStorage.getItem('role_id')
       if(id == 3)
         this.roleSee = false
+      else if(id != 3)
+        this.roleSee = true
     }
   }
 }

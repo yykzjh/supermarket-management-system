@@ -95,7 +95,7 @@
           "username": '',
           "password": '',
           "gender": '',
-          "birthday": '',
+          "birthday": '2000-06-22 00:00:00',
           "mobile": '',
           "area": '',
           "role_id": 1,

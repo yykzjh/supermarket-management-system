@@ -340,7 +340,7 @@ export default {
       nowPosition: null,
       nowPlace: null,
       // numSupplier: [],
-      timesMax: 20,
+      timesMax: 8,
       timesData: {
         "中国":[
           { "name": "北京", "value": 15 },
@@ -543,6 +543,7 @@ export default {
         ],
       }
       this.chartInstance.setOption(returnOption)
+      this.nowPlace = '中国'
       this.nowPosition = 1
     },
     async getGlobalData() {
@@ -574,21 +575,35 @@ export default {
       for (var i in this.citysTemp) {
         if(this.citysTemp[i]['name'] == place){
           this.citysTemp[i]['value'] = this.citysTemp[i]['value'] + ops
-          break
+          return
         }
+      }
+      if(ops == 1) {
+        // console.log(this.citysTemp)
+        // const len = this.citysTemp.length
+        // console.log(len)
+        if(this.citysTemp != null)// 中国某个没有供应商的省
+          this.citysTemp.push({
+            'name': place,
+            'value': 1
+          })
+        else this.citysTemp = { 'name': place, 'value':1} // 该省第一次进驻供应商
+      } else {
+        console.log('Bug 这个地方没有供应商却要删除-1')
       }
     },
     getPlaceData(province, city, op) {
       this.citysTemp = null
       var ops = null
+      console.log(province, city)
       if(op == 'add') {
         ops = 1
         this.citysTemp = this.timesData['中国']
         this.UpdateCitysValue(ops, province)
+        // console.log(this.timesData['中国'])
 
         this.citysTemp = this.timesData[province]
         this.UpdateCitysValue(ops, city)
-
       } else if(op == 'delete') {
         ops = -1
         this.citysTemp = this.timesData['中国']
@@ -597,14 +612,16 @@ export default {
         this.citysTemp = this.timesData[province]
         this.UpdateCitysValue(ops, city)
       }
-      this.updateChart(this.nowPlace)
+      // console.log(this.nowPlace)
+      this.updateChart()
     },
     // 更新当前地理位置图表
-    updateChart(place) {
+    updateChart() {
+      // console.log(this.timesData[this.nowPlace])
       const newOption = {
         series: [
           {
-            data: this.timesData[place]
+            data: this.timesData[this.nowPlace]
           }
         ],
       }
@@ -704,8 +721,9 @@ export default {
 
         this.getPlaceData(province, city, 'add')
 
-        // 新增供货商 更新列表
-        this.supplierList.push({
+        var tempCopy = {}
+        Object.assign(tempCopy, {
+          'id': ret.msg,// 供应商id
           'name': this.addSupplierForm.name,
           'mobile': this.addSupplierForm.mobile,
           'sign_start': this.addSupplierForm.sign_start,
@@ -715,7 +733,11 @@ export default {
           'area': province + city,
           'isEdit': false
         })
-        // console.log(this.supplierList)
+        // console.log('length1',this.supplierList.length)
+        // 新增供货商 更新列表
+        this.supplierList.push(tempCopy)
+        // console.log('length2',this.supplierList.length)
+        console.log(this.supplierList)
         // 清空addSupplierForm信息
         this.InitSupplier()
       }
@@ -871,7 +893,7 @@ export default {
       return false
     },
     async DeleteSupplier(id) {
-      // console.log(id)
+      console.log('deleteID',id)
       // this.DeteleSupplierFromList(id)
 
       const ret = await this.$confirm('此操作将永久删除该供货商, 是否继续?', '提示', {
@@ -889,6 +911,7 @@ export default {
             id: id
           }
         })
+        console.log(id, mess)
         if (mess.StatusCode !== 200) return this.$message.error('删除供货商失败')
         else {
           if(this.DeteleSupplierFromList(id)) this.$message.success('删除供货商成功')

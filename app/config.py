@@ -19,7 +19,7 @@ class Config1(object):
     SQLALCHEMY_ECHO = True
 
     # 配置文件路径，防止恶意读取文件
-    UPLOAD_FOLDER = '/Users/swenw/Desktop/software'
+    UPLOAD_FOLDER = '/Users/swenw/Desktop/software/supermarket/public/static/img'
 
     # 设置上传文件大小
     MAX_CONTENT_LENGTH = 1024 * 1024

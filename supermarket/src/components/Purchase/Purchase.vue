@@ -17,7 +17,7 @@
           ></el-cascader>
         </el-col>
       </el-row>
-      <el-table :data="buyList" border stripe>
+      <el-table :data="buyList.slice((pagenum-1)*pagesize, pagenum*pagesize)" border stripe>
         <el-table-column type="index"></el-table-column>
         <el-table-column prop="good_name" label="名称"></el-table-column>
         <el-table-column prop="supplier_name" label="供应商" ></el-table-column>
@@ -38,6 +38,15 @@
         </el-table-column>
 
       </el-table>
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pagenum"
+        :page-sizes="[2, 5, 10, 20]"
+        :page-size="pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+      </el-pagination>
     </el-card>
   </div>
 </template>
@@ -49,6 +58,8 @@ export default {
       value1: true,
       buyList: [],
       goodList: [],
+      pagesize: 5,
+      pagenum: 1,
       value: [],
       catId: [],
     }
@@ -64,7 +75,9 @@ export default {
       if(this.buyList === [])
         return this.$message.error('订单为空')
       else
-        console.log(this.buyList)
+        this.total = this.buyList.length
+      //  console.log(this.buyList)
+
     },
     async getGoodsList() {
       const {data: res} = await this.$http.get('/Goods/AllCatDetails')
@@ -94,7 +107,14 @@ export default {
         this.$message.success('订单状态更新成功')
         this.getBuyList()
       }
-    }
+    },
+    handleSizeChange(newSize) {
+      this.pagesize = newSize;
+    },
+    // 分页的页面变化
+    handleCurrentChange(newCurr){
+      this.pagenum = newCurr
+    },
   }
 }
 </script>
