@@ -10,7 +10,7 @@ class Config1(object):
     SECRET_KEY = "fjhfdsfhdgsjdsjaffgaj"
 
     # sqlalchemy的配置参数
-    SQLALCHEMY_DATABASE_URI = "mysql://root:sww533212@127.0.0.1:3306/supermarket"
+    SQLALCHEMY_DATABASE_URI = "mysql://SMS1705:SMS1705@127.0.0.1:3306/supermarket"
 
     # 设置sqlalchemy自动跟踪数据库
     SQLALCHEMY_TRACK_MODIFICATIONS = True
@@ -19,7 +19,7 @@ class Config1(object):
     SQLALCHEMY_ECHO = True
 
     # 配置文件路径，防止恶意读取文件
-    UPLOAD_FOLDER = '/Users/swenw/Desktop/software/supermarket/public/static/img'
+    UPLOAD_FOLDER = 'G:/python/anaconda3/envs/supermarket-management-system/supermarket-management-system/images'
 
     # 设置上传文件大小
     MAX_CONTENT_LENGTH = 1024 * 1024
